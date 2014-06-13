@@ -69,7 +69,7 @@ public:
 		double thickness;
 		double width;
 		/*hexagonal lattice parameters*/
-		double a0, c0;
+		double a0;
 
 		struct MisfitDislocationType
 		{
@@ -91,9 +91,9 @@ public:
 	};
 	struct CalculatorSettings
 	{
-		enum {HEXDIM = 4};
-		/*hexagonal index*/
-		int Q[HEXDIM];
+		enum {CUBDIM = 3};
+		/*cubic Miller indices*/
+		int Q[CUBDIM];
 		/*X-ray wavelength*/
 		double lambda;
 

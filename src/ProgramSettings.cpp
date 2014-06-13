@@ -135,19 +135,14 @@ void ProgramSettings::readCalculatorSettings(const libconfig::Setting& root)
 	const libconfig::Setting &calculator = root["Calculator"];
 
 	/*reflection*/
-	if(calculator["Q"].isArray() && calculator["Q"].getLength() == CalculatorSettings::HEXDIM)
+	if(calculator["Q"].isArray() && calculator["Q"].getLength() == CalculatorSettings::CUBDIM)
 	{
-		for(int i = 0; i < CalculatorSettings::HEXDIM; ++i)
+		for(int i = 0; i < CalculatorSettings::CUBDIM; ++i)
 		{
 			m_calculatorSettings.Q[i] = calculator["Q"][i];
 		}
 	}
 	else
-	{
-		throw ProgramSettings::Exception(toString(calculator["Q"].getPath()));
-	}
-	/*check the property of hexagonal Miller indices*/
-	if((m_calculatorSettings.Q[0] + m_calculatorSettings.Q[1] + m_calculatorSettings.Q[2]) != 0)
 	{
 		throw ProgramSettings::Exception(toString(calculator["Q"].getPath()));
 	}
@@ -172,7 +167,6 @@ void ProgramSettings::readSampleSettings(const libconfig::Setting& root)
 
 	/*lattice parameters*/
 	m_sampleSettings.a0 = sample["a0"];
-	m_sampleSettings.c0 = sample["c0"];
 
 	/*Poisson ratio*/
 	m_sampleSettings.nu = sample["nu"];
@@ -228,7 +222,7 @@ void ProgramSettings::readThreadingDislocations(const libconfig::Setting& stg)
 		m_sampleSettings.threading_screw.rho = readFParameter(stg["screw"]["rho"]);
 		m_sampleSettings.threading_screw.rc = readFParameter(stg["screw"]["rc"]);
 		m_sampleSettings.threading_screw.b_edge = 0;
-		m_sampleSettings.threading_screw.b_screw = m_sampleSettings.c0;
+		m_sampleSettings.threading_screw.b_screw = m_sampleSettings.a0;
 	}
 	else
 	{
@@ -241,7 +235,7 @@ void ProgramSettings::readThreadingDislocations(const libconfig::Setting& stg)
 		m_sampleSettings.threading_mixed.rho = readFParameter(stg["mixed"]["rho"]);
 		m_sampleSettings.threading_mixed.rc = readFParameter(stg["mixed"]["rc"]);
 		m_sampleSettings.threading_mixed.b_edge = m_sampleSettings.a0;
-		m_sampleSettings.threading_mixed.b_screw = m_sampleSettings.c0;
+		m_sampleSettings.threading_mixed.b_screw = m_sampleSettings.a0;
 	}
 	else
 	{
@@ -289,7 +283,7 @@ void ProgramSettings::printSampleSettings() const
 {
 	std::cout << "---Sample settings---" << std::endl;
 	std::cout << "Lattice parameters: (a0, c0)\t" << m_sampleSettings.a0 << ", "
-			<< m_sampleSettings.c0 << std::endl;
+			<< std::endl;
 	std::cout << "Sample sizes (thickness width):\t" << m_sampleSettings.thickness << "\t"
 			<< m_sampleSettings.width << std::endl;
 	std::cout << "Poisson ratio:\t" << m_sampleSettings.nu << std::endl;

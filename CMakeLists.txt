@@ -43,9 +43,16 @@ link_directories(${CMAKE_BINARY_DIR}/src/port_project-build)
 link_directories(${CMAKE_BINARY_DIR}/src/config_project-build/lib)
 
 file(GLOB CPP_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-add_executable(DislScatHexFITMisfitThreading ${CPP_SOURCES})
+set(EXEC_NAME DislScatCubFITMisfitThreading)
+add_executable(${EXEC_NAME} ${CPP_SOURCES})
 
-add_dependencies(DislScatHexFITMisfitThreading port_project)
-add_dependencies(DislScatHexFITMisfitThreading config_project)
+add_dependencies(${EXEC_NAME} port_project)
+add_dependencies(${EXEC_NAME} config_project)
 
-target_link_libraries(DislScatHexFITMisfitThreading port config++ gsl blas gfortran)
+target_link_libraries(${EXEC_NAME} 
+                    port
+                    boost_filesystem
+                    boost_system
+                    config++
+                    gsl blas
+                    gfortran)

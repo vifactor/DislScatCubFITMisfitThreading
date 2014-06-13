@@ -12,6 +12,7 @@
 #include "PortFitter.h"
 #include "ProgramSettings.h"
 #include "DataReader.h"
+#include <boost/filesystem.hpp>
 
 #include <fstream>
 

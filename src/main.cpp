@@ -7,12 +7,9 @@
 //============================================================================
 
 #include <iostream>
-#include <fstream>
 #include "Engine.h"
 
 using namespace std;
-
-void copy(std::string src, std::string dest);
 
 int main()
 {
@@ -31,27 +28,4 @@ int main()
 	std::cout << "Done." << std::endl;
 
 	return 0;
-}
-
-void copy(std::string src, std::string dest)
-{
-	std::ofstream fout;
-	std::ifstream fin;
-	std::string filename, line;
-
-	filename = dest;
-	stripExtension(filename);
-	filename += ".~cfg";
-
-	fout.open(filename.c_str());
-	fin.open(src.c_str());
-
-	while (!fin.eof())
-	{
-		getline(fin, line);
-		fout << line;
-	}
-
-	fin.close();
-	fout.close();
 }

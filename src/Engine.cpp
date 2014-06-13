@@ -177,7 +177,7 @@ void Engine::saveResume() const
 	{
 		fin.close();
 		fout.open(filename.c_str(), std::ios::out);
-		fout << "#cfg\tdat\tH\tK\tI\tL\t"<<
+		fout << "#cfg\tdat\tH\tK\tL\t"<<
 				"rho_edge\trc_edge\tM_edge\t" <<
 				"rho_screw\trc_screw\tM_screw\t" <<
 				"rho_mixed\trc_mixed\tM_mixed\trho_misfit\n";
@@ -186,8 +186,8 @@ void Engine::saveResume() const
 	fout << m_programSettings->getEngineSettings().datafile << "\t";
 	fout << m_programSettings->getCalculatorSettings().Q[0] << "\t" <<
 			m_programSettings->getCalculatorSettings().Q[1] << "\t" <<
-			m_programSettings->getCalculatorSettings().Q[2] << "\t" <<
-			m_programSettings->getCalculatorSettings().Q[3] << "\t";
+			m_programSettings->getCalculatorSettings().Q[2] << "\t";
+			
 	fout << rho_edge << "\t";
 	fout << rc_edge << "\t";
 	fout << M_edge << "\t";
@@ -205,12 +205,13 @@ void Engine::saveResume() const
 void Engine::saveSettings() const
 {
 	libconfig::Config cfg;
-	std::string oldcfgfile, newcfgfile;
+	boost::filesystem::path oldcfgfile, newcfgfile;
 
 	oldcfgfile = m_programSettings->getConfigfile();
+	oldcfgfile.replace_extension(".~cfg");
 	newcfgfile = m_programSettings->getConfigfile();
-	stripExtension(newcfgfile);
-	newcfgfile += "_mod.cfg";
+	/*save old configuration in a file with extension ~cfg*/
+	boost::filesystem::rename(newcfgfile, oldcfgfile);
 
 	try
 	{
@@ -227,7 +228,7 @@ void Engine::saveSettings() const
 		cfg.writeFile (newcfgfile.c_str());
 	} catch (const libconfig::FileIOException &fioex)
 	{
-		throw Engine::Exception("I/O error while reading file:\t" + oldcfgfile);
+		throw Engine::Exception("I/O error while reading file:\t" + oldcfgfile.native());
 	} catch (const libconfig::ParseException &pex)
 	{
 		throw Engine::Exception("Parse error at " +
@@ -316,10 +317,10 @@ void Engine::setupCalculator()
 
 	/*get Q in hexagonal miller indices*/
 	Q = m_programSettings->getCalculatorSettings().Q;
-	Qx = 2 * M_PI * sqrt(2.0 / 3 * (Q[0] * Q[0] + Q[1] * Q[1] + Q[2] * Q[2]))
+	Qx = 2 * M_PI * sqrt(Q[0] * Q[0] + Q[1] * Q[1])
 					  / m_programSettings->getSampleSettings().a0;
-	Qz = 2 * M_PI * Q[3]
-	                  / m_programSettings->getSampleSettings().c0;
+	Qz = 2 * M_PI * Q[2]
+	                  / m_programSettings->getSampleSettings().a0;
 
 	try
 	{
