@@ -21,7 +21,7 @@ double ana_coplanar_triple_integrand_xz1(double x, void *params)
 }
 
 ANACalculatorCoplanarTriple::ANACalculatorCoplanarTriple(
-		const ANASampleHex * sample, size_t sampling, double epsabs)
+		const ANASampleCub * sample, size_t sampling, double epsabs)
 {
 
 	m_sample = sample;

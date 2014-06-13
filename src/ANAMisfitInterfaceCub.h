@@ -1,22 +1,22 @@
 /*
- * TMisfitInterfaceHex.h
+ * TANAMisfitInterfaceCub.h
  *
  *  Created on: 7 черв. 2013
  *      Author: kopp
  */
 
-#ifndef MISFITHEX_H_
-#define MISFITHEX_H_
+#ifndef ANAMISFITINTERFACECUB_H_
+#define ANAMISFITINTERFACECUB_H_
 
 #include <gsl/gsl_math.h>
 #include <iostream>
 
-class MisfitInterfaceHex
+class ANAMisfitInterfaceCub
 {
 public:
-	MisfitInterfaceHex(double rho, double bx, double bz, double Qx, double Qz, double nu,
+	ANAMisfitInterfaceCub(double rho, double bx, double bz, double Qx, double Qz, double nu,
 		 double d);
-	virtual ~MisfitInterfaceHex();
+	virtual ~ANAMisfitInterfaceCub();
     double wxx() const;
     double wzz() const;
     double wxz() const;
@@ -48,4 +48,4 @@ protected:
     mutable double denom;
 };
 
-#endif /* MISFITHEX_H_ */
+#endif /* ANAMISFITINTERFACECUB_H_ */

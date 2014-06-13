@@ -54,7 +54,7 @@ private:
 	void saveFitIntensity() const;
 	void printFitterInfo(NonlinearFit::NonlinearFitter * fitter);
 
-	ANASampleHex  * m_sample;
+	ANASampleCub  * m_sample;
 	ANACalculatorCoplanarTriple *  m_calculator;
 	FitANACalculatorCoplanarTriple *  m_fit_calculator;
 	NonlinearFit::NonlinearFitter * m_fitter;

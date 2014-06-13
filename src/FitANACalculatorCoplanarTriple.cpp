@@ -7,7 +7,7 @@
 
 #include "FitANACalculatorCoplanarTriple.h"
 
-FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator, ANASampleHex * sample)
+FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator, ANASampleCub * sample)
 {
 	m_calculator = calculator;
 	m_sample = sample;

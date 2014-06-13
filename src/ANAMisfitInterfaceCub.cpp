@@ -1,13 +1,13 @@
 /*
- * MisfitInterfaceHex.cpp
+ * ANAMisfitInterfaceCub.cpp
  *
  *  Created on: 7 june 2013
  *      Author: kopp
  */
 
-#include "MisfitInterfaceHex.h"
+#include "ANAMisfitInterfaceCub.h"
 
-MisfitInterfaceHex::MisfitInterfaceHex(double rho, double bx, double bz, double Qx, double Qz,
+ANAMisfitInterfaceCub::ANAMisfitInterfaceCub(double rho, double bx, double bz, double Qx, double Qz,
 		double nu, double d)
 {
 	alpha = 1.0 / (2 * (1- nu));
@@ -27,11 +27,11 @@ MisfitInterfaceHex::MisfitInterfaceHex(double rho, double bx, double bz, double 
 	init(1.0);
 }
 
-MisfitInterfaceHex::~MisfitInterfaceHex()
+ANAMisfitInterfaceCub::~ANAMisfitInterfaceCub()
 {
 }
 
-double MisfitInterfaceHex::T(double x, double z1, double z2) const
+double ANAMisfitInterfaceCub::T(double x, double z1, double z2) const
 {
 	static double z, result;
 
@@ -58,7 +58,7 @@ double MisfitInterfaceHex::T(double x, double z1, double z2) const
 }
 
 
-double MisfitInterfaceHex::wxx() const
+double ANAMisfitInterfaceCub::wxx() const
 {
 	static double result, result_bx, result_bz;
 
@@ -88,7 +88,7 @@ double MisfitInterfaceHex::wxx() const
 	return result;
 }
 
-double MisfitInterfaceHex::wzz() const
+double ANAMisfitInterfaceCub::wzz() const
 {
 	double result, result_bx, result_bz;
 
@@ -116,7 +116,7 @@ double MisfitInterfaceHex::wzz() const
 	return result;
 }
 
-double MisfitInterfaceHex::wxz() const
+double ANAMisfitInterfaceCub::wxz() const
 {
 	double result, result_bx, result_bz;
 
@@ -142,7 +142,7 @@ double MisfitInterfaceHex::wxz() const
 	return result;
 }
 
-void MisfitInterfaceHex::init(double z) const
+void ANAMisfitInterfaceCub::init(double z) const
 {
 	xi = z / m_d;
 	xi2 = xi * xi;
@@ -156,7 +156,7 @@ void MisfitInterfaceHex::init(double z) const
 	denom = (8. * m_d * M_PI * (-1 + xi) * gsl_pow_5(1 + xi));
 }
 
-double MisfitInterfaceHex::Wxxxx_bx() const
+double ANAMisfitInterfaceCub::Wxxxx_bx() const
 {
 	static double result;
 
@@ -172,7 +172,7 @@ double MisfitInterfaceHex::Wxxxx_bx() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wzzzz_bx() const
+double ANAMisfitInterfaceCub::Wzzzz_bx() const
 {
 	double result;
 
@@ -190,7 +190,7 @@ double MisfitInterfaceHex::Wzzzz_bx() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wxzxz_bx() const
+double ANAMisfitInterfaceCub::Wxzxz_bx() const
 {
 	double result;
 
@@ -207,7 +207,7 @@ double MisfitInterfaceHex::Wxzxz_bx() const
 }
 
 
-double MisfitInterfaceHex::Wxxzz_bx() const
+double ANAMisfitInterfaceCub::Wxxzz_bx() const
 {
 	double result;
 
@@ -221,7 +221,7 @@ double MisfitInterfaceHex::Wxxzz_bx() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wzxzx_bx() const
+double ANAMisfitInterfaceCub::Wzxzx_bx() const
 {
 	double result;
 
@@ -238,7 +238,7 @@ double MisfitInterfaceHex::Wzxzx_bx() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wxzzx_bx() const
+double ANAMisfitInterfaceCub::Wxzzx_bx() const
 {
 	double result;
 
@@ -251,7 +251,7 @@ double MisfitInterfaceHex::Wxzzx_bx() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wxxxx_bz() const
+double ANAMisfitInterfaceCub::Wxxxx_bz() const
 {
 
 	double result;
@@ -266,7 +266,7 @@ double MisfitInterfaceHex::Wxxxx_bz() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wzzzz_bz() const
+double ANAMisfitInterfaceCub::Wzzzz_bz() const
 {
 	double result;
 
@@ -283,7 +283,7 @@ double MisfitInterfaceHex::Wzzzz_bz() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wxzxz_bz() const
+double ANAMisfitInterfaceCub::Wxzxz_bz() const
 {
 	double result;
 
@@ -299,7 +299,7 @@ double MisfitInterfaceHex::Wxzxz_bz() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wxxzz_bz() const
+double ANAMisfitInterfaceCub::Wxxzz_bz() const
 {
 	double result;
 
@@ -314,7 +314,7 @@ double MisfitInterfaceHex::Wxxzz_bz() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wzxzx_bz() const
+double ANAMisfitInterfaceCub::Wzxzx_bz() const
 {
 	double result;
 
@@ -330,7 +330,7 @@ double MisfitInterfaceHex::Wzxzx_bz() const
 	return result;
 }
 
-double MisfitInterfaceHex::Wxzzx_bz() const
+double ANAMisfitInterfaceCub::Wxzzx_bz() const
 {
 	double result;
 

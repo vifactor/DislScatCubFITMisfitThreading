@@ -270,7 +270,7 @@ void ProgramSettings::printCalculatorSettings() const
 	std::cout << "---Calculator settings---" << std::endl;
 	std::cout << "Reflection:\t[" << m_calculatorSettings.Q[0] << ", "
 			<< m_calculatorSettings.Q[1] << ", " << m_calculatorSettings.Q[2]
-			<< ", " << m_calculatorSettings.Q[3] << "]" << std::endl;
+			<< "]" << std::endl;
 	std::cout << "X-ray wavelength:\t" << m_calculatorSettings.lambda << std::endl;
 	std::cout << "Resolutions (dqx, dqz):\t" << m_calculatorSettings.qresolX
 			<< "\t" << m_calculatorSettings.qresolZ << std::endl;
@@ -282,7 +282,7 @@ void ProgramSettings::printCalculatorSettings() const
 void ProgramSettings::printSampleSettings() const
 {
 	std::cout << "---Sample settings---" << std::endl;
-	std::cout << "Lattice parameters: (a0, c0)\t" << m_sampleSettings.a0 << ", "
+	std::cout << "Lattice parameters: (a0)\t" << m_sampleSettings.a0 << ", "
 			<< std::endl;
 	std::cout << "Sample sizes (thickness width):\t" << m_sampleSettings.thickness << "\t"
 			<< m_sampleSettings.width << std::endl;

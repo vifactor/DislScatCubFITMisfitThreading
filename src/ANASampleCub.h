@@ -1,22 +1,22 @@
 /*
- * ANASampleHex.h
+ * ANASampleCub.h
  *
  *  Created on: 12 черв. 2013
  *      Author: kopp
  */
 
-#ifndef ANASAMPLEHEX_H_
-#define ANASAMPLEHEX_H_
+#ifndef ANASAMPLECUB_H_
+#define ANASAMPLECUB_H_
 
-#include "MisfitInterfaceHex.h"
-#include "ThreadingLayerHex.h"
+#include "ANAMisfitInterfaceCub.h"
+#include "ANAThreadingLayerCub.h"
 #include <vector>
 
-class ANASampleHex
+class ANASampleCub
 {
 public:
-	ANASampleHex(double thickness, double size);
-	~ANASampleHex();
+	ANASampleCub(double thickness, double size);
+	~ANASampleCub();
 
 	void addThreadingLayer(double rho, double b_edge, double b_screw, double rc,
 			double Qx, double Qz, double nu);
@@ -30,8 +30,8 @@ public:
 	double m_thickness;
 	double m_size;
 protected:
-	std::vector<MisfitInterfaceHex * > m_interfaces;
-	std::vector<ThreadingLayerHex * > m_layers;
+	std::vector<ANAMisfitInterfaceCub * > m_interfaces;
+	std::vector<ANAThreadingLayerCub * > m_layers;
 };
 
-#endif /* ANASAMPLEHEX_H_ */
+#endif /* ANASampleCub_H_ */

@@ -324,7 +324,7 @@ void Engine::setupCalculator()
 
 	try
 	{
-		m_sample = new ANASampleHex(m_programSettings->getSampleSettings().thickness,
+		m_sample = new ANASampleCub(m_programSettings->getSampleSettings().thickness,
 				m_programSettings->getSampleSettings().width);
 
 		/*one misfit interfaces*/

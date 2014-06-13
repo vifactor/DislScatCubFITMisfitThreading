@@ -8,7 +8,7 @@
 #ifndef ANACALCULATORCOPLANARTRIPLE_H_
 #define ANACALCULATORCOPLANARTRIPLE_H_
 
-#include "ANASampleHex.h"
+#include "ANASampleCub.h"
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_sf_trig.h>
@@ -17,17 +17,17 @@
 class ANACalculatorCoplanarTriple
 {
 public:
-	ANACalculatorCoplanarTriple(const ANASampleHex * sample, size_t sampling = 100, double epsabs = 1e-5);
+	ANACalculatorCoplanarTriple(const ANASampleCub * sample, size_t sampling = 100, double epsabs = 1e-5);
 	virtual ~ANACalculatorCoplanarTriple();
 
 	virtual void setResolution(double fwhm_qx, double fwhm_qz);
-	virtual void setSample(const ANASampleHex * sample) {m_sample = sample;}
+	virtual void setSample(const ANASampleCub * sample) {m_sample = sample;}
 	virtual double I(const double qx, const double qz);
 	virtual double I(const double qx, const double qz, double & error);
 
 	friend double ana_coplanar_triple_integrand_xz1(double x, void *params);
 protected:
-	const ANASampleHex * m_sample;
+	const ANASampleCub * m_sample;
 
 	double m_qx, m_qz;
 	double m_resol2_x, m_resol2_z;

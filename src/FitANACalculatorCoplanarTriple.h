@@ -23,13 +23,13 @@ class FitANACalculatorCoplanarTriple:
 		public NonlinearFit::FitCalculator
 {
 public:
-	FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator, ANASampleHex * sample);
+	FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator, ANASampleCub * sample);
 	virtual ~FitANACalculatorCoplanarTriple();
 	virtual void reinit(const NonlinearFit::CalculatorParameterMap& params);
 	virtual double eval(const NonlinearFit::CalculatorArgument * arg);
 protected:
 	ANACalculatorCoplanarTriple * m_calculator;
-	ANASampleHex * m_sample;
+	ANASampleCub * m_sample;
 	double m_scale, m_background;
 };
 

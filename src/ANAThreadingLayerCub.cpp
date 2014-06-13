@@ -1,13 +1,13 @@
 /*
- * ThreadingLayerHex.cpp
+ * ANAThreadingLayerCub.cpp
  *
  *  Created on: 11 черв. 2013
  *      Author: kopp
  */
 
-#include "ThreadingLayerHex.h"
+#include "ANAThreadingLayerCub.h"
 
-ThreadingLayerHex::ThreadingLayerHex(double rho, double b_edge, double b_screw, double rc, double Qx, double Qz, double nu)
+ANAThreadingLayerCub::ANAThreadingLayerCub(double rho, double b_edge, double b_screw, double rc, double Qx, double Qz, double nu)
 {
 	double Q, sin2Psi, cos2Psi;
 
@@ -31,11 +31,11 @@ ThreadingLayerHex::ThreadingLayerHex(double rho, double b_edge, double b_screw, 
 	m_gb_screw = sqrt(m_gb2_screw);
 }
 
-ThreadingLayerHex::~ThreadingLayerHex()
+ANAThreadingLayerCub::~ANAThreadingLayerCub()
 {
 }
 
-double ThreadingLayerHex::T(double r, double phi) const
+double ANAThreadingLayerCub::T(double r, double phi) const
 {
 	static double result;
 
@@ -44,7 +44,7 @@ double ThreadingLayerHex::T(double r, double phi) const
 	return result;
 }
 
-double ThreadingLayerHex::T_edge(double r, double phi) const
+double ANAThreadingLayerCub::T_edge(double r, double phi) const
 {
 	static double result;
 
@@ -57,7 +57,7 @@ double ThreadingLayerHex::T_edge(double r, double phi) const
 	return result;
 }
 
-double ThreadingLayerHex::T_screw(double r) const
+double ANAThreadingLayerCub::T_screw(double r) const
 {
 	static double result;
 
@@ -70,12 +70,12 @@ double ThreadingLayerHex::T_screw(double r) const
 	return result;
 }
 
-double ThreadingLayerHex::chi_screw() const
+double ANAThreadingLayerCub::chi_screw() const
 {
 	return m_C_screw;
 }
 
-double ThreadingLayerHex::chi_edge(double phi) const
+double ANAThreadingLayerCub::chi_edge(double phi) const
 {
 	return m_C1_edge + m_C2_edge * gsl_pow_2(cos(phi));
 }
