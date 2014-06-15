@@ -1,24 +1,36 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(DislScatHexFITMisfitThreading)
+project(DislScatCubFITMisfitThreading)
 
 #Check if important libraries are available.
 
 #Gnu Scientific library
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules") # findGSL module is not shipped with cmake
+set(CMAKE_MODULE_PATH 
+    ${CMAKE_MODULE_PATH} 
+    "${CMAKE_SOURCE_DIR}/CMakeModules") # findGSL module is not shipped with cmake
 find_package(GSL REQUIRED)
 
 #BLAS
 find_package(BLAS REQUIRED)
 
+#BOOST
+find_package(Boost COMPONENTS filesystem system REQUIRED)
+
 #some libraries are build as external projects
 include(ExternalProject)
+
+#misfit interfaces library
+ExternalProject_Add(
+    minterface_project
+    PREFIX ${CMAKE_BINARY_DIR}
+    GIT_REPOSITORY https://github.com/vifactor/AnalyticalMisfitInterface.git
+)
+
 
 #port library
 ExternalProject_Add(
     port_project
     PREFIX ${CMAKE_BINARY_DIR}
-    URL ${CMAKE_CURRENT_SOURCE_DIR}/tarballs/port.tar.gz
     GIT_REPOSITORY https://github.com/vifactor/PortLibrary.git
 )
 
@@ -37,8 +49,10 @@ ExternalProject_Add(
 #compile project itself
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_BINARY_DIR}/src/port_project-build)
+include_directories(${CMAKE_BINARY_DIR}/src/minterface_project-build)
 include_directories(${CMAKE_BINARY_DIR}/src/config_project-build/include)
 
+link_directories(${CMAKE_BINARY_DIR}/src/minterface_project-build)
 link_directories(${CMAKE_BINARY_DIR}/src/port_project-build)
 link_directories(${CMAKE_BINARY_DIR}/src/config_project-build/lib)
 
@@ -46,11 +60,13 @@ file(GLOB CPP_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 set(EXEC_NAME DislScatCubFITMisfitThreading)
 add_executable(${EXEC_NAME} ${CPP_SOURCES})
 
+add_dependencies(${EXEC_NAME} minterface_project)
 add_dependencies(${EXEC_NAME} port_project)
 add_dependencies(${EXEC_NAME} config_project)
 
 target_link_libraries(${EXEC_NAME} 
                     port
+                    interface
                     boost_filesystem
                     boost_system
                     config++
