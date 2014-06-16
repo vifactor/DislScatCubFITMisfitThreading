@@ -24,6 +24,7 @@ ExternalProject_Add(
     minterface_project
     PREFIX ${CMAKE_BINARY_DIR}
     GIT_REPOSITORY https://github.com/vifactor/AnalyticalMisfitInterface.git
+    GIT_TAG origin
 )
 
 #Miller indices library
@@ -31,6 +32,7 @@ ExternalProject_Add(
     miller_project
     PREFIX ${CMAKE_BINARY_DIR}
     GIT_REPOSITORY https://github.com/vifactor/MillerIndices.git
+    GIT_TAG origin
 )
 
 #port library
@@ -38,6 +40,7 @@ ExternalProject_Add(
     port_project
     PREFIX ${CMAKE_BINARY_DIR}
     GIT_REPOSITORY https://github.com/vifactor/PortLibrary.git
+    GIT_TAG origin
 )
 
 #config++ library
@@ -56,6 +59,7 @@ ExternalProject_Add(
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_BINARY_DIR}/src/port_project-build)
 include_directories(${CMAKE_BINARY_DIR}/src/minterface_project-build)
+include_directories(${CMAKE_BINARY_DIR}/src/miller_project-build)
 include_directories(${CMAKE_BINARY_DIR}/src/config_project-build/include)
 
 link_directories(${CMAKE_BINARY_DIR}/src/miller_project-build)
