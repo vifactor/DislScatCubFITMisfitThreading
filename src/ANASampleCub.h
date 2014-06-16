@@ -8,7 +8,7 @@
 #ifndef ANASAMPLECUB_H_
 #define ANASAMPLECUB_H_
 
-#include "ANAMisfitInterfaceCub.h"
+#include "AnalyticalMisfitInterfaceCub.h"
 #include "ANAThreadingLayerCub.h"
 #include <vector>
 
@@ -20,17 +20,18 @@ public:
 
 	void addThreadingLayer(double rho, double b_edge, double b_screw, double rc,
 			double Qx, double Qz, double nu);
-	void addMisfitInterface(double rho, double bx, double bz, double Qx,
-			double Qz, double nu, double d);
+	void addMisfitInterface(double rho, double bx, double by, double bz,
+	                     double Qx, double Qy, double Qz,
+	                     double phi0, double nu, double d);
 	void resetMisfitInterface(size_t i, double rho);
 	void resetThreadingLayer(size_t i, double rho, double rc);
 	double T_threading(double r, double phi) const;
-	double T_misfit(double x, double z1, double z2) const;
-	void w_matrix(double z1, double& wxx, double& wxz, double& wzz) const;
+	double T_misfit(double x, double y, double z1, double z2) const;
+	void wij(double z1, double& wxx, double& wxz, double& wzz) const;
 	double m_thickness;
 	double m_size;
 protected:
-	std::vector<ANAMisfitInterfaceCub * > m_interfaces;
+	std::vector<AnalyticalMisfitInterfaceCub * > m_interfaces;
 	std::vector<ANAThreadingLayerCub * > m_layers;
 };
 

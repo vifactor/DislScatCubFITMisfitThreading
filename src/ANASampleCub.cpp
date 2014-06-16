@@ -36,14 +36,14 @@ double ANASampleCub::T_threading(double r, double phi) const
 	return result;
 }
 
-double ANASampleCub::T_misfit(double x, double z1, double z2) const
+double ANASampleCub::T_misfit(double x, double y, double z1, double z2) const
 {
 	static double result;
 
 	result = 0.0;
 	for(size_t i = 0; i < m_interfaces.size(); ++i)
 	{
-		result += m_interfaces[i]->T(x, z1, z2);
+		result += m_interfaces[i]->T(x, y, z1, z2);
 	}
 	return result;
 }
@@ -54,13 +54,16 @@ void ANASampleCub::addThreadingLayer(double rho, double b_edge, double b_screw, 
 	m_layers.push_back(new ANAThreadingLayerCub(rho, b_edge, b_screw, rc, Qx, Qz, nu));
 }
 
-void ANASampleCub::addMisfitInterface(double rho, double bx, double bz, double Qx,
-		double Qz, double nu, double d)
+void ANASampleCub::addMisfitInterface(double rho, double bx, double by, double bz,
+                    double Qx, double Qy, double Qz,
+                    double phi, double nu, double d)
 {
-	m_interfaces.push_back(new ANAMisfitInterfaceCub(rho, bx, bz, Qx, Qz, nu, d));
+	m_interfaces.push_back(new AnalyticalMisfitInterfaceCub(rho, bx, by, bz,
+	                     Qx, Qy, Qz,
+	                     phi, nu, d));
 }
 
-void ANASampleCub::w_matrix(double z1, double& wxx, double& wxz, double& wzz) const
+void ANASampleCub::wij(double z1, double& wxx, double& wxz, double& wzz) const
 {
 	wxx = 0.0;
 	wxz = 0.0;
@@ -70,9 +73,9 @@ void ANASampleCub::w_matrix(double z1, double& wxx, double& wxz, double& wzz) co
 	{
 		m_interfaces[i]->init(z1);
 
-		wxx += m_interfaces[i]->wxx() * m_interfaces[i]->m_rho / 2;
-		wxz += m_interfaces[i]->wxz() * m_interfaces[i]->m_rho / 2;
-		wzz += m_interfaces[i]->wzz() * m_interfaces[i]->m_rho / 2;
+		wxx += m_interfaces[i]->wxx() * m_interfaces[i]->get_rho() / 2;
+		wxz += m_interfaces[i]->wxz() * m_interfaces[i]->get_rho() / 2;
+		wzz += m_interfaces[i]->wzz() * m_interfaces[i]->get_rho() / 2;
 	}
 }
 
@@ -80,7 +83,7 @@ void ANASampleCub::resetMisfitInterface(size_t i, double rho)
 {
 	if(i < m_interfaces.size())
 	{
-		m_interfaces[i]->m_rho = rho;
+		m_interfaces[i]->set_rho(rho);
 	}
 }
 

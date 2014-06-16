@@ -331,7 +331,10 @@ void Engine::setupCalculator()
 		m_sample->addMisfitInterface(
 					m_programSettings->getSampleSettings().misfit.rho.m_Value * 1e-7,
 					m_programSettings->getSampleSettings().misfit.b_x,
-					m_programSettings->getSampleSettings().misfit.b_z, Qx, Qz,
+					0.0,//TODO change if "by" is considered
+					m_programSettings->getSampleSettings().misfit.b_z,
+					Qx, 0.0, Qz, //in coplanar geometry Qy = 0
+					0.0,//TODO true for planes along Burgers vector
 					m_programSettings->getSampleSettings().nu,
 					m_programSettings->getSampleSettings().thickness);
 		/*add threading layers*/

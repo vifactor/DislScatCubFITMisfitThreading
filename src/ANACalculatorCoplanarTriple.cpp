@@ -146,7 +146,7 @@ void ANACalculatorCoplanarTriple::prepare(double z1)
 {
 	static double wxx, wxz, wzz;
 
-	m_sample->w_matrix(z1, wxx, wxz, wzz);
+	m_sample->wij(z1, wxx, wxz, wzz);
 
 	/*take into account resolution*/
 	wxx += m_resol2_x;
