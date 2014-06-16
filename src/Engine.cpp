@@ -321,6 +321,11 @@ void Engine::setupCalculator()
 					  / m_programSettings->getSampleSettings().a0;
 	Qz = 2 * M_PI * Q[2]
 	                  / m_programSettings->getSampleSettings().a0;
+	                  
+	/* sign of the first index of Q determines the difference between reflections
+	 * like [224] and [-2-24]
+	*/
+	Qx *= -GSL_SIGN (Q[0]);
 
 	try
 	{
@@ -333,7 +338,7 @@ void Engine::setupCalculator()
 					m_programSettings->getSampleSettings().misfit.b_x,
 					0.0,//TODO change if "by" is considered
 					m_programSettings->getSampleSettings().misfit.b_z,
-					Qx, 0.0, Qz, //in coplanar geometry Qy = 0
+					-Qx, 0.0, Qz, //in coplanar geometry Qy = 0
 					0.0,//TODO true for planes along Burgers vector
 					m_programSettings->getSampleSettings().nu,
 					m_programSettings->getSampleSettings().thickness);
