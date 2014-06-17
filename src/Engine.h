@@ -30,7 +30,7 @@ public:
 		std::string msg;
 	};
 	Engine();
-	void exec(const std::string & cfgname);
+	void exec(const boost::filesystem::path & cfgfolder);
 	virtual ~Engine();
 private:
 	void init();
@@ -71,6 +71,8 @@ private:
 	std::vector<double> m_exp_intens_vals, m_ini_intens_vals, m_fin_intens_vals;
 	NonlinearFit::DataPointList m_DataPoints;
 	NonlinearFit::ResidualList m_Residuals;
+	
+	boost::filesystem::path m_WorkDir;
 };
 
 #endif /* Engine_H_ */

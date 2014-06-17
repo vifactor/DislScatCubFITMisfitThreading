@@ -3,29 +3,33 @@
 // Author      : Viktor Kopp
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
+// Description : Fit of X-ray data to model including 
+//              misfit and threading dislocation
 //============================================================================
 
-#include <iostream>
 #include "Engine.h"
 
-using namespace std;
-
-int main()
+int main(int argc, char ** argv)
 {
-	Engine engine;
-	std::string cfgfile;
-	try
+	if(argc > 1)
 	{
-		cfgfile = "default.cfg";
-		engine.exec(cfgfile);
-	}catch(const ProgramSettings::Exception& ex)
+	    Engine engine;
+	    try
+	    {
+	        /* argv[1] contains name of the work folder*/
+		    engine.exec(argv[1]);
+	    }catch(const ProgramSettings::Exception& ex)
+	    {
+		    std::cout << ex.what() << std::endl;
+		    return EXIT_FAILURE;
+	    }
+	}
+	else
 	{
-		std::cout << ex.what() << std::endl;
-		return -1;
+	    std::cout << "No work folder specified." << std::endl;
 	}
 
 	std::cout << "Done." << std::endl;
 
-	return 0;
+	return EXIT_SUCCESS;
 }

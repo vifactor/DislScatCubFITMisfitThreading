@@ -9,6 +9,7 @@
 using namespace NonlinearFit;
 using namespace Geometry;
 
+/*----------- Handy functions --------------*/
 Vector3d toMisfitFrame(const Vector3d& burgers,
                      const Vector3d& line,
                      const Vector3d& normal)
@@ -66,7 +67,7 @@ double toMisfitInPlaneAngle(const Vector3d& Q, const Vector3d& burgers,
     
     return acos(inner_prod(Qpar_dir, misf_dir));
 }
-
+/*----------- end handy functions -----------*/
 Engine::Engine()
 {
 	m_calculator = NULL;
@@ -95,10 +96,14 @@ Engine::~Engine()
 	}
 }
 
-void Engine::exec(const std::string & cfgname)
+void Engine::exec(const boost::filesystem::path & workDir)
 {
+    /*TODO change*/
+    boost::filesystem::path configpath = workDir / "default.cfg";
+    
+    m_WorkDir = workDir;
 	m_programSettings = new ProgramSettings;
-	m_programSettings->read(cfgname);
+	m_programSettings->read(configpath.c_str());
 
 	m_programSettings->print();
 	init();
@@ -314,12 +319,15 @@ void Engine::setupComponents()
 void Engine::readData()
 {
 	DataReader dr;
-	dr.readFile(m_programSettings->getEngineSettings().datafile);
+	boost::filesystem::path datapath;
+	
+	datapath = m_WorkDir / m_programSettings->getEngineSettings().datafile;
+	dr.readFile(datapath.c_str());
 
 	if(!dr.good())
 	{
-		throw Engine::Exception("File " + m_programSettings->getEngineSettings().datafile +
-				" has not been read or has no a header");
+		throw Engine::Exception("File " + datapath.native() +
+				" has not been read or has no header");
 	}
 
 	if(dr.columnExist("[intensity]"))
