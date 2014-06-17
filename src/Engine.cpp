@@ -29,6 +29,20 @@ Vector3d toMisfitFrame(const Vector3d& burgers,
     return Vector3d(bx, by, bz);
 }
 
+Vector3d toCoplanarFrame(const Vector3d& Q, const Vector3d& normal)
+{
+    Vector3d norm_dir;
+    double Qx, Qy, Qz;
+
+    norm_dir = normalize(normal);
+    
+    Qz = inner_prod(Q, normal);
+    Qy = 0.0;//in coplanar geometry Qy = 0
+    Qx = norm_2(Q - Qz * normal);
+    
+    return Vector3d(Qx, Qy, Qz);
+}
+
 Engine::Engine()
 {
 	m_calculator = NULL;
@@ -205,9 +219,9 @@ void Engine::saveResume() const
 	}
 	fout << m_programSettings->getConfigfile() << "\t";
 	fout << m_programSettings->getEngineSettings().datafile << "\t";
-	fout << m_programSettings->getCalculatorSettings().Q[0] << "\t" <<
-			m_programSettings->getCalculatorSettings().Q[1] << "\t" <<
-			m_programSettings->getCalculatorSettings().Q[2] << "\t";
+	fout << m_programSettings->getCalculatorSettings().Q.H << "\t" <<
+			m_programSettings->getCalculatorSettings().Q.K << "\t" <<
+			m_programSettings->getCalculatorSettings().Q.L << "\t";
 			
 	fout << rho_edge << "\t";
 	fout << rc_edge << "\t";
@@ -332,8 +346,7 @@ void Engine::readData()
 
 void Engine::setupCalculator()
 {
-	double Qx, Qz;
-	const int * Q;
+    Vector3d Q_vec, Q;
 	Vector3d b_vec, l_vec, n_vec, b;
 	MillerCubIndicesTransformator transformator(
 	                                m_programSettings->getSampleSettings().a0);
@@ -343,17 +356,14 @@ void Engine::setupCalculator()
 	n_vec = Vector3d(0, 0, 1);
 	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
-	/*get Q in hexagonal miller indices*/
-	Q = m_programSettings->getCalculatorSettings().Q;
-	Qx = 2 * M_PI * sqrt(Q[0] * Q[0] + Q[1] * Q[1])
-					  / m_programSettings->getSampleSettings().a0;
-	Qz = 2 * M_PI * Q[2]
-	                  / m_programSettings->getSampleSettings().a0;
-	                  
-	/* sign of the first index of Q determines the difference between reflections
+	/*transform hexagonal miller indices to vector*/
+	Q_vec = transformator.toVector3d(m_programSettings->getCalculatorSettings().Q);
+	/*get Q in coplanar frame*/
+	Q = toCoplanarFrame(Q_vec, n_vec);
+	/* sign of the first index of Q_vec determines the difference between reflections
 	 * like [224] and [-2-24]
 	*/
-	Qx *= -GSL_SIGN (Q[0]);
+	Q[0] *= GSL_SIGN (Q_vec[0]);
 
 	try
 	{
@@ -364,7 +374,7 @@ void Engine::setupCalculator()
 		m_sample->addMisfitInterface(
 					m_programSettings->getSampleSettings().misfit.rho.m_Value * 1e-7,
 					b(0), b(1), b(2),
-					-Qx, 0.0, Qz, //in coplanar geometry Qy = 0
+					Q(0), Q(1), Q(2),
 					0.0,//TODO true for planes along Burgers vector
 					m_programSettings->getSampleSettings().nu,
 					m_programSettings->getSampleSettings().thickness);
@@ -373,19 +383,19 @@ void Engine::setupCalculator()
 					m_programSettings->getSampleSettings().threading_edge.rho.m_Value * 1e-14,
 					m_programSettings->getSampleSettings().threading_edge.b_edge,
 					m_programSettings->getSampleSettings().threading_edge.b_screw,
-					m_programSettings->getSampleSettings().threading_edge.rc.m_Value, Qx, Qz,
+					m_programSettings->getSampleSettings().threading_edge.rc.m_Value, Q(0), Q(2),
 					m_programSettings->getSampleSettings().nu);
 		m_sample->addThreadingLayer(
 					m_programSettings->getSampleSettings().threading_screw.rho.m_Value * 1e-14,
 					m_programSettings->getSampleSettings().threading_screw.b_edge,
 					m_programSettings->getSampleSettings().threading_screw.b_screw,
-					m_programSettings->getSampleSettings().threading_screw.rc.m_Value, Qx, Qz,
+					m_programSettings->getSampleSettings().threading_screw.rc.m_Value, Q(0), Q(2),
 					m_programSettings->getSampleSettings().nu);
 		m_sample->addThreadingLayer(
 					m_programSettings->getSampleSettings().threading_mixed.rho.m_Value * 1e-14,
 					m_programSettings->getSampleSettings().threading_mixed.b_edge,
 					m_programSettings->getSampleSettings().threading_mixed.b_screw,
-					m_programSettings->getSampleSettings().threading_mixed.rc.m_Value, Qx, Qz,
+					m_programSettings->getSampleSettings().threading_mixed.rc.m_Value, Q(0), Q(2),
 					m_programSettings->getSampleSettings().nu);
 
 		m_calculator = new ANACalculatorCoplanarTriple(m_sample,

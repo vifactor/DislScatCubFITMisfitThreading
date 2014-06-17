@@ -92,9 +92,8 @@ public:
 	};
 	struct CalculatorSettings
 	{
-		enum {CUBDIM = 3};
 		/*cubic Miller indices*/
-		int Q[CUBDIM];
+		MillerReciprocalCubIndices Q;
 		/*X-ray wavelength*/
 		double lambda;
 

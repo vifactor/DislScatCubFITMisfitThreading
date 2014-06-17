@@ -135,12 +135,12 @@ void ProgramSettings::readCalculatorSettings(const libconfig::Setting& root)
 	const libconfig::Setting &calculator = root["Calculator"];
 
 	/*reflection*/
-	if(calculator["Q"].isArray() && calculator["Q"].getLength() == CalculatorSettings::CUBDIM)
+	if(calculator["Q"].isArray() && calculator["Q"].getLength() 
+	                                               == MillerCubIndicesDimension)
 	{
-		for(int i = 0; i < CalculatorSettings::CUBDIM; ++i)
-		{
-			m_calculatorSettings.Q[i] = calculator["Q"][i];
-		}
+		m_calculatorSettings.Q.H = calculator["Q"][0];
+		m_calculatorSettings.Q.K = calculator["Q"][1];
+		m_calculatorSettings.Q.L = calculator["Q"][2];
 	}
 	else
 	{
@@ -289,9 +289,7 @@ void ProgramSettings::print() const
 void ProgramSettings::printCalculatorSettings() const
 {
 	std::cout << "---Calculator settings---" << std::endl;
-	std::cout << "Reflection:\t[" << m_calculatorSettings.Q[0] << ", "
-			<< m_calculatorSettings.Q[1] << ", " << m_calculatorSettings.Q[2]
-			<< "]" << std::endl;
+	std::cout << "Reflection:\t" << m_calculatorSettings.Q << std::endl;
 	std::cout << "X-ray wavelength:\t" << m_calculatorSettings.lambda << std::endl;
 	std::cout << "Resolutions (dqx, dqz):\t" << m_calculatorSettings.qresolX
 			<< "\t" << m_calculatorSettings.qresolZ << std::endl;
