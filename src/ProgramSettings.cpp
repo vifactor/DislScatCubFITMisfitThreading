@@ -182,8 +182,29 @@ void ProgramSettings::readSampleSettings(const libconfig::Setting& root)
 	if(dislocations.exists("misfit"))
 	{
 		m_sampleSettings.misfit.rho = readFParameter(dislocations["misfit"]["rho"]);
-		m_sampleSettings.misfit.b_x = dislocations["misfit"]["b_x"];
-		m_sampleSettings.misfit.b_z = dislocations["misfit"]["b_z"];
+		/*burgers vector*/
+	    if(dislocations["misfit"]["b"].isArray() && 
+	       dislocations["misfit"]["b"].getLength() == MillerCubIndicesDimension)
+	    {
+		    m_sampleSettings.misfit.b.X = dislocations["misfit"]["b"][0];
+		    m_sampleSettings.misfit.b.Y = dislocations["misfit"]["b"][1];
+		    m_sampleSettings.misfit.b.Z = dislocations["misfit"]["b"][2];
+		}
+		else
+		    throw ProgramSettings::Exception(toString(
+		                            dislocations["misfit"]["b"].getPath()));
+		/*dislocation line*/
+	    if(dislocations["misfit"]["l"].isArray() && 
+	       dislocations["misfit"]["l"].getLength() 
+	                                            == MillerCubIndicesDimension)
+	    {
+		    m_sampleSettings.misfit.l.X = dislocations["misfit"]["l"][0];
+		    m_sampleSettings.misfit.l.Y = dislocations["misfit"]["l"][1];
+		    m_sampleSettings.misfit.l.Z = dislocations["misfit"]["l"][2];
+	    }
+	    else
+		    throw ProgramSettings::Exception(toString(
+		                            dislocations["misfit"]["l"].getPath()));
 	}
 	else
 	{
@@ -308,10 +329,8 @@ void ProgramSettings::printEngineSettings() const
 
 void ProgramSettings::printMisfitDislocations() const
 {
-	std::cout << "\tBurgers vector (bx):\t" << m_sampleSettings.misfit.b_x
-			<< std::endl;
-	std::cout << "\tBurgers vector (bz):\t" << m_sampleSettings.misfit.b_z
-			<< std::endl;
+	std::cout << "\tBurgers vector:\t" << m_sampleSettings.misfit.b << std::endl;
+	std::cout << "\tDislocation line:\t" << m_sampleSettings.misfit.l << std::endl;
 	std::cout << "\tDensity :\t" << m_sampleSettings.misfit.rho << std::endl;
 }
 

@@ -10,6 +10,7 @@
 
 #include "StringTools.h"
 #include "NonlinearFit.h"
+#include <MillerIndexCub.h>
 #include <libconfig.h++>
 
 struct Range
@@ -74,7 +75,7 @@ public:
 		struct MisfitDislocationType
 		{
 			/*burgers components*/
-			double b_x, b_z;
+			MillerDirectCubIndices b, l;
 			NonlinearFit::FitParameter rho;
 		};
 		struct ThreadingDislocationType

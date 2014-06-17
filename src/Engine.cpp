@@ -7,6 +7,27 @@
 #include "Engine.h"
 
 using namespace NonlinearFit;
+using namespace Geometry;
+
+Vector3d toMisfitFrame(const Vector3d& burgers,
+                     const Vector3d& line,
+                     const Vector3d& normal)
+{
+    Vector3d misf_dir;
+    Vector3d line_dir;
+    Vector3d norm_dir;
+    
+    line_dir = normalize(line);
+    norm_dir = normalize(normal);
+    misf_dir = cross(normal, line);
+    
+    /*misfit, screw and bz-edge components of the dislocation*/
+    double bx = inner_prod(burgers, misf_dir);
+    double by = inner_prod(burgers, line_dir);
+    double bz = inner_prod(burgers, norm_dir);
+    
+    return Vector3d(bx, by, bz);
+}
 
 Engine::Engine()
 {
@@ -311,9 +332,16 @@ void Engine::readData()
 
 void Engine::setupCalculator()
 {
-
 	double Qx, Qz;
 	const int * Q;
+	Vector3d b_vec, l_vec, n_vec, b;
+	MillerCubIndicesTransformator transformator(
+	                                m_programSettings->getSampleSettings().a0);
+	
+	l_vec = transformator.toVector3d(m_programSettings->getSampleSettings().misfit.l);
+	b_vec = transformator.toVector3d(m_programSettings->getSampleSettings().misfit.b);
+	n_vec = Vector3d(0, 0, 1);
+	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
 	/*get Q in hexagonal miller indices*/
 	Q = m_programSettings->getCalculatorSettings().Q;
@@ -335,9 +363,7 @@ void Engine::setupCalculator()
 		/*one misfit interfaces*/
 		m_sample->addMisfitInterface(
 					m_programSettings->getSampleSettings().misfit.rho.m_Value * 1e-7,
-					m_programSettings->getSampleSettings().misfit.b_x,
-					0.0,//TODO change if "by" is considered
-					m_programSettings->getSampleSettings().misfit.b_z,
+					b(0), b(1), b(2),
 					-Qx, 0.0, Qz, //in coplanar geometry Qy = 0
 					0.0,//TODO true for planes along Burgers vector
 					m_programSettings->getSampleSettings().nu,
