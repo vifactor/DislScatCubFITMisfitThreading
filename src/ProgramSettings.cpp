@@ -114,14 +114,25 @@ ProgramSettings::~ProgramSettings()
 void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 {
 	libconfig::Config cfg;
-
+	libconfig::Config datacfg;
+	boost::filesystem::path datacfgfile;
+	
 	m_cfgfile = cfgdir / "default.cfg";
+	datacfgfile = cfgdir / "data.cfg";
 	// Read the file. If there is an error, report it
 	try
 	{
 		cfg.readFile(m_cfgfile.c_str());
 		cfg.setAutoConvert(true);
 		const libconfig::Setting& root = cfg.getRoot();
+		
+		/*FIXME temporary*/
+		ProgramSettings::DataConfig data;
+		datacfg.readFile(datacfgfile.c_str());
+		datacfg.setAutoConvert(true);
+		const libconfig::Setting& dataroot = datacfg.getRoot();
+		data.set(dataroot["Data"]);
+		std::cout << data << std::endl;
 
 		readSampleSettings(root);
 		readCalculatorSettings(root);
