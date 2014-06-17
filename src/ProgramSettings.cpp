@@ -1,22 +1,46 @@
 /*
  * ProgramSettings.cpp
  *
- *  Created on: 11 черв. 2013
+ *  Created on: 11 june 2013
  *      Author: kopp
  */
 
 #include "ProgramSettings.h"
 using namespace NonlinearFit;
 
-Range readRange(const libconfig::Setting& stg)
+/*----- Data settings -----*/
+void ProgramSettings::DataConfig::set(const libconfig::Setting& data)
 {
-	Range range;
+    if(data["Q"].isArray() && data["Q"].getLength() 
+	                                               == MillerCubIndicesDimension)
+	{
+		Q.H = data["Q"][0];
+		Q.K = data["Q"][1];
+		Q.L = data["Q"][2];
+	}
+	else
+	{
+		throw ProgramSettings::Exception(toString(data["Q"].getPath()));
+	}
+    
+    resolX = data["resolution"]["x"];
+	resolZ = data["resolution"]["z"];
+	
+	I0 = data["I0"];
+	Ibg = data["Ibg"];
+	
+    file = data["file"].c_str();
+}
 
-	range.m_min = stg[0][0];
-	range.m_max = stg[0][1];
-	range.m_sampling = stg[1];
-
-	return range;
+std::ostream& operator<<(std::ostream& out, const ProgramSettings::DataConfig &data)
+{
+    out << "---Data settings---" << std::endl;
+	out << "\tReflection:\t" << data.Q << std::endl;
+	out << "\tResolutions (dqx, dqz):\t" << data.resolX
+			<< "\t" << data.resolZ << std::endl;
+	out << "\tScale:\t" << data.I0 << std::endl;
+	out << "\tBackground:\t" << data.Ibg << std::endl;
+	return out;
 }
 
 FitParameter readFParameter(const libconfig::Setting& stg)
@@ -63,12 +87,6 @@ FitParameter readFParameter(const libconfig::Setting& stg)
 		throw ProgramSettings::Exception("Inappropriate type " + toString(stg.getPath()));
 	}
 	return fparameter;
-}
-
-std::ostream& operator<<(std::ostream& out, const Range& range)
-{
-	out << "[" << range.m_min << ", " << range.m_max << "]:" << range.m_sampling;
-	return out;
 }
 
 std::ostream& operator<<(std::ostream& out, const FitParameter& fparam)

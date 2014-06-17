@@ -2,6 +2,7 @@
  * ProgramSettings.h
  *
  *  Created on: 11 june 2013
+ *  Modified on: 17 june 2014
  *      Author: kopp
  */
 
@@ -12,37 +13,7 @@
 #include "NonlinearFit.h"
 #include <MillerIndexCub.h>
 #include <libconfig.h++>
-
-struct Range
-{
-	double m_min;
-	double m_max;
-	size_t m_sampling;
-
-	double getStep() const
-	{
-		return (m_sampling > 1) ? (m_max - m_min) / (m_sampling - 1) : 0.0;
-	}
-	void toVector(std::vector<double>& vec) const
-	{
-		double step = getStep();
-		for (size_t i = 0; i < m_sampling; ++i)
-		{
-			vec.push_back(m_min + step * i);
-		}
-	}
-	bool good() const
-	{
-		if ((m_min <= m_max) && (m_sampling > 0))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-};
+#include <boost/filesystem.hpp>
 
 class ProgramSettings
 {
@@ -109,6 +80,16 @@ public:
 		std::string datafile;
 		std::string resumefile;
 		int nb_iter;
+	};
+	struct DataConfig
+	{
+        MillerReciprocalCubIndices Q;
+        double resolX, resolZ;
+        boost::filesystem::path file;
+        double Ibg, I0;
+        
+        friend std::ostream& operator<< (std::ostream &out, const DataConfig &data);
+        void set(const libconfig::Setting&);
 	};
 	const SampleSettings& getSampleSettings() const
 	{
