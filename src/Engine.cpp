@@ -19,7 +19,7 @@ Vector3d toMisfitFrame(const Vector3d& burgers,
     
     line_dir = normalize(line);
     norm_dir = normalize(normal);
-    misf_dir = cross(normal, line);
+    misf_dir = cross(norm_dir, line_dir);
     
     /*misfit, screw and bz-edge components of the dislocation*/
     double bx = inner_prod(burgers, misf_dir);
@@ -36,11 +36,35 @@ Vector3d toCoplanarFrame(const Vector3d& Q, const Vector3d& normal)
 
     norm_dir = normalize(normal);
     
-    Qz = inner_prod(Q, normal);
+    Qz = inner_prod(Q, norm_dir);
     Qy = 0.0;//in coplanar geometry Qy = 0
-    Qx = norm_2(Q - Qz * normal);
+    Qx = norm_2(Q - Qz * norm_dir);
     
     return Vector3d(Qx, Qy, Qz);
+}
+
+double toMisfitInPlaneAngle(const Vector3d& Q, const Vector3d& burgers,
+                const Vector3d& line, const Vector3d& normal)
+{
+    /* gives angle between in-plane component of reflection vector
+     * and misfit component of Burgers vector
+     */
+    Vector3d misf_dir;
+    Vector3d line_dir;
+    Vector3d norm_dir;
+    Vector3d Qpar_dir;
+    Vector3d Qpar;
+    double Qz;
+    
+    line_dir = normalize(line);
+    norm_dir = normalize(normal);
+    misf_dir = cross(norm_dir, line_dir);
+    
+    Qz = inner_prod(Q, norm_dir);
+    Qpar = Q - Qz * norm_dir;
+    Qpar_dir = normalize(Qpar);
+    
+    return acos(inner_prod(Qpar_dir, misf_dir));
 }
 
 Engine::Engine()
@@ -350,6 +374,7 @@ void Engine::setupCalculator()
 	Vector3d b_vec, l_vec, n_vec, b;
 	MillerCubIndicesTransformator transformator(
 	                                m_programSettings->getSampleSettings().a0);
+	double phi;
 	
 	l_vec = transformator.toVector3d(m_programSettings->getSampleSettings().misfit.l);
 	b_vec = transformator.toVector3d(m_programSettings->getSampleSettings().misfit.b);
@@ -364,7 +389,9 @@ void Engine::setupCalculator()
 	 * like [224] and [-2-24]
 	*/
 	Q[0] *= GSL_SIGN (Q_vec[0]);
-
+	
+	phi = toMisfitInPlaneAngle(Q_vec, b_vec, l_vec, n_vec);
+                
 	try
 	{
 		m_sample = new ANASampleCub(m_programSettings->getSampleSettings().thickness,
@@ -375,7 +402,7 @@ void Engine::setupCalculator()
 					m_programSettings->getSampleSettings().misfit.rho.m_Value * 1e-7,
 					b(0), b(1), b(2),
 					Q(0), Q(1), Q(2),
-					0.0,//TODO true for planes along Burgers vector
+					phi,
 					m_programSettings->getSampleSettings().nu,
 					m_programSettings->getSampleSettings().thickness);
 		/*add threading layers*/
