@@ -111,11 +111,11 @@ ProgramSettings::~ProgramSettings()
 {
 }
 
-void ProgramSettings::read(const std::string& cfgfile)
+void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 {
 	libconfig::Config cfg;
 
-	m_cfgfile = cfgfile;
+	m_cfgfile = cfgdir / "default.cfg";
 	// Read the file. If there is an error, report it
 	try
 	{
@@ -128,23 +128,23 @@ void ProgramSettings::read(const std::string& cfgfile)
 		readEngineSettings(root);
 	} catch (const libconfig::FileIOException &fioex)
 	{
-		throw Exception(toString(fioex.what()) + " in\t" + cfgfile);
+		throw Exception(toString(fioex.what()) + " in\t" + m_cfgfile.native());
 	} catch (const libconfig::ParseException &pex)
 	{
 		throw Exception(
-				toString(pex.what()) + " in\t" + cfgfile + ":"
+				toString(pex.what()) + " in\t" + m_cfgfile.native() + ":"
 						+ toString(pex.getLine()) + " - "
 						+ toString(pex.getError()));
 	} catch (const libconfig::SettingNotFoundException &nfex)
 	{
 		throw Exception(
 				toString(nfex.what()) + "\t" + toString(nfex.getPath())
-						+ " in\t" + cfgfile);
+						+ " in\t" + m_cfgfile.native());
 	} catch (libconfig::SettingTypeException& tex)
 	{
 		throw Exception(
 				toString(tex.what()) + "\t" + toString(tex.getPath()) + " in\t"
-						+ cfgfile);
+						+ m_cfgfile.native());
 	}
 }
 

@@ -98,12 +98,10 @@ Engine::~Engine()
 
 void Engine::exec(const boost::filesystem::path & workDir)
 {
-    /*TODO change*/
-    boost::filesystem::path configpath = workDir / "default.cfg";
-    
+   
     m_WorkDir = workDir;
 	m_programSettings = new ProgramSettings;
-	m_programSettings->read(configpath.c_str());
+	m_programSettings->read(m_WorkDir);
 
 	m_programSettings->print();
 	init();

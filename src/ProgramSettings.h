@@ -103,14 +103,14 @@ public:
 	{
 		return m_engineSettings;
 	}
-	const std::string& getConfigfile() const
+	const boost::filesystem::path& getConfigfile() const
 	{
 		return m_cfgfile;
 	}
 	ProgramSettings();
 	virtual ~ProgramSettings();
 
-	void read(const std::string& cfg);
+	void read(const boost::filesystem::path& cfgdir);
 	void print() const;
 protected:
 	void readCalculatorSettings(const libconfig::Setting& root);
@@ -132,7 +132,7 @@ protected:
 	SampleSettings m_sampleSettings;
 	CalculatorSettings m_calculatorSettings;
 	EngineSettings m_engineSettings;
-	std::string m_cfgfile;
+	boost::filesystem::path m_cfgfile;
 };
 
 #endif /* PROGRAMSETTINGS_H_ */
