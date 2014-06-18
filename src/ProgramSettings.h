@@ -148,6 +148,23 @@ public:
 	{
 		return m_engineSettings;
 	}
+	
+	const SampleConfig& getSampleConfig() const
+	{
+		return m_sampleConfig;
+	}
+	const DataConfig& getDataConfig() const
+	{
+		return m_dataConfig;
+	}
+	const FitConfig& getFitConfig() const
+	{
+		return m_fitConfig;
+	}
+	const NonlinearFit::CalculatorParameterMap& getCPMap() const
+	{
+	    return m_cpMap;
+	}
 	const boost::filesystem::path& getConfigfile() const
 	{
 		return m_cfgfile;
@@ -180,6 +197,9 @@ protected:
 	boost::filesystem::path m_cfgfile;
 	
 	NonlinearFit::CalculatorParameterMap m_cpMap;
+	SampleConfig m_sampleConfig;
+	DataConfig m_dataConfig;
+	FitConfig m_fitConfig;
 };
 
 #endif /* PROGRAMSETTINGS_H_ */

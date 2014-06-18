@@ -308,26 +308,23 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 	try
 	{	
 		/*FIXME temporary -----*/
-		ProgramSettings::SampleConfig sample;
 		samplecfg.readFile(samplecfgfile.c_str());
 		samplecfg.setAutoConvert(true);
 		const libconfig::Setting& sampleroot = samplecfg.getRoot();
-		sample.set(sampleroot["Sample"], m_cpMap);
-		std::cout << sample << std::endl;
+		m_sampleConfig.set(sampleroot["Sample"], m_cpMap);
+		std::cout << m_sampleConfig << std::endl;
 		
-		ProgramSettings::DataConfig data;
 		datacfg.readFile(datacfgfile.c_str());
 		datacfg.setAutoConvert(true);
 		const libconfig::Setting& dataroot = datacfg.getRoot();
-		data.set(dataroot["Data"], m_cpMap);
-		std::cout << data << std::endl;
+		m_dataConfig.set(dataroot["Data"], m_cpMap);
+		std::cout << m_dataConfig << std::endl;
 		
-		ProgramSettings::FitConfig fit;
 		fitcfg.readFile(fitcfgfile.c_str());
 		fitcfg.setAutoConvert(true);
 		const libconfig::Setting& fitroot = fitcfg.getRoot();
-		fit.set(fitroot["Fit"], m_cpMap);
-		std::cout << fit << std::endl;
+		m_fitConfig.set(fitroot["Fit"], m_cpMap);
+		std::cout << m_fitConfig << std::endl;
 		
         for (CalculatorParameterMap::iterator it=m_cpMap.begin(); it!=m_cpMap.end(); ++it)
             std::cout << it->first << " => " << it->second << '\n';
