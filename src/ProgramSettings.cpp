@@ -9,7 +9,9 @@
 using namespace NonlinearFit;
 
 /*----- Data settings -----*/
-void ProgramSettings::DataConfig::set(const libconfig::Setting& data)
+void 
+ProgramSettings::DataConfig::set(const libconfig::Setting& data,
+                                CalculatorParameterMap& cmap) 
 {
     if(data["Q"].isArray() && data["Q"].getLength() 
 	                                               == MillerCubIndicesDimension)
@@ -27,7 +29,9 @@ void ProgramSettings::DataConfig::set(const libconfig::Setting& data)
 	resolZ = data["resolution"]["z"];
 	
 	I0 = data["I0"];
+	cmap[data["I0"].getPath()] = I0;
 	Ibg = data["Ibg"];
+	cmap[data["Ibg"].getPath()] = Ibg;
 	
     file = data["file"].c_str();
 }
@@ -46,9 +50,12 @@ operator<<(std::ostream& out, const ProgramSettings::DataConfig &data)
 }
 
 /*----- Fit settings -----*/
-void ProgramSettings::FitConfig::set(const libconfig::Setting& fit)
+void ProgramSettings::FitConfig::set(const libconfig::Setting& fit,
+                const CalculatorParameterMap& cmap)
 {
     FitParameter param;
+    CalculatorParameterMap::const_iterator it;
+    
 	nbIterations = fit["nbIterations"];
     if(fit["parameters"].isList())
     {
@@ -56,11 +63,17 @@ void ProgramSettings::FitConfig::set(const libconfig::Setting& fit)
         {
             const libconfig::Setting& stg = fit["parameters"][i];
             param.m_Name = stg["name"].c_str();
-		    //FIXME param.m_Value = stg;
-		    param.m_Lbvalue = stg["minVal"];
-		    param.m_Ubvalue = stg["maxVal"];
-		    
-		    fitParameters.push_back(param);
+            it = cmap.find(param.m_Name);
+		    if(it != cmap.end())
+		    {
+		        param.m_Value = it->second;
+		        param.m_Lbvalue = stg["minVal"];
+		        param.m_Ubvalue = stg["maxVal"];
+		        fitParameters.push_back(param);
+		    }
+	        else
+	            std::cout << "No such cmap parameter:\t" << param.m_Name 
+	                       << std::endl;
 		}
     }
 }
@@ -82,7 +95,9 @@ operator<<(std::ostream& out, const ProgramSettings::FitConfig &fit)
 }
 
 /*----- Sample settings -----*/
-void ProgramSettings::SampleConfig::set(const libconfig::Setting& sample)
+void 
+ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
+                                 CalculatorParameterMap& cmap)
 {
 	/*lattice parameters*/
 	a0 = sample["a0"];
@@ -96,6 +111,7 @@ void ProgramSettings::SampleConfig::set(const libconfig::Setting& sample)
 	if(dislocations.exists("misfit"))
 	{
 		misfit.rho = dislocations["misfit"]["rho"];
+        cmap[dislocations["misfit"]["rho"].getPath()] = misfit.rho;
 		/*burgers vector*/
 	    if(dislocations["misfit"]["b"].isArray() && 
 	       dislocations["misfit"]["b"].getLength() == MillerCubIndicesDimension)
@@ -131,7 +147,9 @@ void ProgramSettings::SampleConfig::set(const libconfig::Setting& sample)
 		if(threading.exists("edge"))
 	    {
 		    threading_edge.rho = threading["edge"]["rho"];
+		    cmap[threading["edge"]["rho"].getPath()] = threading_edge.rho;
 		    threading_edge.rc = threading["edge"]["rc"];
+		    cmap[threading["edge"]["rc"].getPath()] = threading_edge.rc;
 		    threading_edge.b_edge = a0;
 		    threading_edge.b_screw = 0.0;
 	    }
@@ -144,7 +162,9 @@ void ProgramSettings::SampleConfig::set(const libconfig::Setting& sample)
 	    if(threading.exists("screw"))
 	    {
 		    threading_screw.rho = threading["screw"]["rho"];
+		    cmap[threading["screw"]["rho"].getPath()] = threading_screw.rho;
 		    threading_screw.rc = threading["screw"]["rc"];
+		    cmap[threading["screw"]["rc"].getPath()] = threading_screw.rc;
 		    threading_screw.b_edge = 0;
 		    threading_screw.b_screw = a0;
 	    }
@@ -157,7 +177,9 @@ void ProgramSettings::SampleConfig::set(const libconfig::Setting& sample)
 	    if(threading.exists("mixed"))
 	    {
 		    threading_mixed.rho = threading["mixed"]["rho"];
+		    cmap[threading["mixed"]["rho"].getPath()] = threading_mixed.rho;
 		    threading_mixed.rc = threading["mixed"]["rc"];
+		    cmap[threading["mixed"]["rho"].getPath()] = threading_mixed.rc;
 		    threading_mixed.b_edge = a0;
 		    threading_mixed.b_screw = a0;
 	    }
@@ -290,23 +312,26 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 		samplecfg.readFile(samplecfgfile.c_str());
 		samplecfg.setAutoConvert(true);
 		const libconfig::Setting& sampleroot = samplecfg.getRoot();
-		sample.set(sampleroot["Sample"]);
+		sample.set(sampleroot["Sample"], m_cpMap);
 		std::cout << sample << std::endl;
 		
 		ProgramSettings::DataConfig data;
 		datacfg.readFile(datacfgfile.c_str());
 		datacfg.setAutoConvert(true);
 		const libconfig::Setting& dataroot = datacfg.getRoot();
-		data.set(dataroot["Data"]);
+		data.set(dataroot["Data"], m_cpMap);
 		std::cout << data << std::endl;
 		
 		ProgramSettings::FitConfig fit;
 		fitcfg.readFile(fitcfgfile.c_str());
 		fitcfg.setAutoConvert(true);
 		const libconfig::Setting& fitroot = fitcfg.getRoot();
-		fit.set(fitroot["Fit"]);
+		fit.set(fitroot["Fit"], m_cpMap);
 		std::cout << fit << std::endl;
-		/*FIXME temporary -----*/
+		
+        for (CalculatorParameterMap::iterator it=m_cpMap.begin(); it!=m_cpMap.end(); ++it)
+            std::cout << it->first << " => " << it->second << '\n';
+		/*FIXME temporary solution -----*/
 
         cfg.readFile(m_cfgfile.c_str());
 		cfg.setAutoConvert(true);

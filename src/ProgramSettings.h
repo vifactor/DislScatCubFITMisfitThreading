@@ -89,7 +89,8 @@ public:
         double Ibg, I0;
         
         friend std::ostream& operator<< (std::ostream &out, const DataConfig &data);
-        void set(const libconfig::Setting&);
+        void set(const libconfig::Setting&, 
+                NonlinearFit::CalculatorParameterMap&);
 	};
 	struct FitConfig
 	{
@@ -98,7 +99,8 @@ public:
 	    
         friend std::ostream& operator<< (std::ostream &out,
                                         const FitConfig &data);
-        void set(const libconfig::Setting&);
+        void set(const libconfig::Setting&, 
+                const NonlinearFit::CalculatorParameterMap&);
 	};
 	struct SampleConfig
 	{
@@ -131,7 +133,8 @@ public:
 		ThreadingDislocationType threading_mixed;
         friend std::ostream& operator<< (std::ostream &out,
                                         const SampleConfig &data);
-        void set(const libconfig::Setting&);
+        void set(const libconfig::Setting&, 
+                NonlinearFit::CalculatorParameterMap&);
 	};
 	const SampleSettings& getSampleSettings() const
 	{
@@ -175,6 +178,8 @@ protected:
 	CalculatorSettings m_calculatorSettings;
 	EngineSettings m_engineSettings;
 	boost::filesystem::path m_cfgfile;
+	
+	NonlinearFit::CalculatorParameterMap m_cpMap;
 };
 
 #endif /* PROGRAMSETTINGS_H_ */
