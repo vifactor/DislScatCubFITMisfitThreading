@@ -91,6 +91,48 @@ public:
         friend std::ostream& operator<< (std::ostream &out, const DataConfig &data);
         void set(const libconfig::Setting&);
 	};
+	struct FitConfig
+	{
+	    int nbIterations;
+	    NonlinearFit::FitParameterList fitParameters;
+	    
+        friend std::ostream& operator<< (std::ostream &out,
+                                        const FitConfig &data);
+        void set(const libconfig::Setting&);
+	};
+	struct SampleConfig
+	{
+	    /*Poisson ratio*/
+	    double nu;
+		/*sample dimensions*/
+		double thickness;
+		double width;
+		/*cubic lattice parameters*/
+		double a0;
+
+		struct MisfitDislocationType
+		{
+			/*burgers components*/
+			MillerDirectCubIndices b, l;
+			double rho;
+		};
+		struct ThreadingDislocationType
+		{
+			double b_edge, b_screw;
+			/*dislocation density*/
+			double rho;
+			/*correlation radius*/
+			double rc;
+		};
+
+		MisfitDislocationType misfit;
+		ThreadingDislocationType threading_edge;
+		ThreadingDislocationType threading_screw;
+		ThreadingDislocationType threading_mixed;
+        friend std::ostream& operator<< (std::ostream &out,
+                                        const SampleConfig &data);
+        void set(const libconfig::Setting&);
+	};
 	const SampleSettings& getSampleSettings() const
 	{
 		return m_sampleSettings;
@@ -107,8 +149,8 @@ public:
 	{
 		return m_cfgfile;
 	}
-	ProgramSettings();
-	virtual ~ProgramSettings();
+	ProgramSettings(){}
+	virtual ~ProgramSettings(){}
 
 	void read(const boost::filesystem::path& cfgdir);
 	void print() const;
