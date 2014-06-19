@@ -21,7 +21,7 @@ public:
 	class Exception: public std::exception
 	{
 	public:
-		Exception(std::string m) :
+		Exception(const std::string& m) :
 			msg("Engine::" + m){}
 		~Exception() throw () {}
 		const char* what() const throw () {return msg.c_str();}

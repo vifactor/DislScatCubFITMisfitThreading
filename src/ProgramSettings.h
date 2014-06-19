@@ -21,9 +21,14 @@ public:
 	class Exception: public std::exception
 	{
 	public:
-		Exception(std::string m)
+		Exception(const std::string& m)
 		{
 			msg = "ProgramSettings::" + m;
+		}
+		Exception(const char * m)
+		{
+			msg = "ProgramSettings::";
+			msg += m;
 		}
 		~Exception() throw ()
 		{

@@ -22,7 +22,7 @@ ProgramSettings::DataConfig::set(const libconfig::Setting& data,
 	}
 	else
 	{
-		throw ProgramSettings::Exception(toString(data["Q"].getPath()));
+		throw ProgramSettings::Exception(data["Q"].getPath());
 	}
     
     resolX = data["resolution"]["x"];
@@ -133,8 +133,8 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 		    misfit.l.Z = dislocations["misfit"]["l"][2];
 	    }
 	    else
-		    throw ProgramSettings::Exception(toString(
-		                            dislocations["misfit"]["l"].getPath()));
+		    throw ProgramSettings::Exception(
+		                            dislocations["misfit"]["l"].getPath());
 	}
 	else
 	{
