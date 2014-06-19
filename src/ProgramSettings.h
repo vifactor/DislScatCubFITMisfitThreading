@@ -130,10 +130,10 @@ public:
         void set(const libconfig::Setting&, 
                 NonlinearFit::CalculatorParameterMap&);
 	};
-	const SampleSettings& getSampleSettings() const
+	/*const SampleSettings& getSampleSettings() const
 	{
 		return m_sampleSettings;
-	}
+	}*/
 	const CalculatorSettings& getCalculatorSettings() const
 	{
 		return m_calculatorSettings;

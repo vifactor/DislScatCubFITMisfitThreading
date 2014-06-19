@@ -336,11 +336,11 @@ void Engine::setupCalculator()
     Vector3d Q_vec, Q;
 	Vector3d b_vec, l_vec, n_vec, b;
 	MillerCubIndicesTransformator transformator(
-	                                m_programSettings->getSampleSettings().a0);
+	                                m_programSettings->getSampleConfig().a0);
 	double phi;
 	
-	l_vec = transformator.toVector3d(m_programSettings->getSampleSettings().misfit.l);
-	b_vec = transformator.toVector3d(m_programSettings->getSampleSettings().misfit.b);
+	l_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit.l);
+	b_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit.b);
 	n_vec = Vector3d(0, 0, 1);
 	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
@@ -357,36 +357,36 @@ void Engine::setupCalculator()
                 
 	try
 	{
-		m_sample = new ANASampleCub(m_programSettings->getSampleSettings().thickness,
-				m_programSettings->getSampleSettings().width);
+		m_sample = new ANASampleCub(m_programSettings->getSampleConfig().thickness,
+				m_programSettings->getSampleConfig().width);
 
 		/*one misfit interfaces*/
 		m_sample->addMisfitInterface(
-					m_programSettings->getSampleSettings().misfit.rho.m_Value * 1e-7,
+					m_programSettings->getSampleConfig().misfit.rho * 1e-7,
 					b(0), b(1), b(2),
 					Q(0), Q(1), Q(2),
 					phi,
-					m_programSettings->getSampleSettings().nu,
-					m_programSettings->getSampleSettings().thickness);
+					m_programSettings->getSampleConfig().nu,
+					m_programSettings->getSampleConfig().thickness);
 		/*add threading layers*/
 		m_sample->addThreadingLayer(
-					m_programSettings->getSampleSettings().threading_edge.rho.m_Value * 1e-14,
-					m_programSettings->getSampleSettings().threading_edge.b_edge,
-					m_programSettings->getSampleSettings().threading_edge.b_screw,
-					m_programSettings->getSampleSettings().threading_edge.rc.m_Value, Q(0), Q(2),
-					m_programSettings->getSampleSettings().nu);
+					m_programSettings->getSampleConfig().threading_edge.rho * 1e-14,
+					m_programSettings->getSampleConfig().threading_edge.b_edge,
+					m_programSettings->getSampleConfig().threading_edge.b_screw,
+					m_programSettings->getSampleConfig().threading_edge.rc, Q(0), Q(2),
+					m_programSettings->getSampleConfig().nu);
 		m_sample->addThreadingLayer(
-					m_programSettings->getSampleSettings().threading_screw.rho.m_Value * 1e-14,
-					m_programSettings->getSampleSettings().threading_screw.b_edge,
-					m_programSettings->getSampleSettings().threading_screw.b_screw,
-					m_programSettings->getSampleSettings().threading_screw.rc.m_Value, Q(0), Q(2),
-					m_programSettings->getSampleSettings().nu);
+					m_programSettings->getSampleConfig().threading_screw.rho * 1e-14,
+					m_programSettings->getSampleConfig().threading_screw.b_edge,
+					m_programSettings->getSampleConfig().threading_screw.b_screw,
+					m_programSettings->getSampleConfig().threading_screw.rc, Q(0), Q(2),
+					m_programSettings->getSampleConfig().nu);
 		m_sample->addThreadingLayer(
-					m_programSettings->getSampleSettings().threading_mixed.rho.m_Value * 1e-14,
-					m_programSettings->getSampleSettings().threading_mixed.b_edge,
-					m_programSettings->getSampleSettings().threading_mixed.b_screw,
-					m_programSettings->getSampleSettings().threading_mixed.rc.m_Value, Q(0), Q(2),
-					m_programSettings->getSampleSettings().nu);
+					m_programSettings->getSampleConfig().threading_mixed.rho * 1e-14,
+					m_programSettings->getSampleConfig().threading_mixed.b_edge,
+					m_programSettings->getSampleConfig().threading_mixed.b_screw,
+					m_programSettings->getSampleConfig().threading_mixed.rc, Q(0), Q(2),
+					m_programSettings->getSampleConfig().nu);
 
 		m_calculator = new ANACalculatorCoplanarTriple(m_sample,
 				m_programSettings->getCalculatorSettings().sampling);
