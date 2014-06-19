@@ -147,7 +147,7 @@ void Engine::calcI(std::vector<double>& vals)
 {
 	double I;
 
-	m_fit_calculator->reinit(m_cParameters);
+	m_fit_calculator->reinit(m_programSettings->getCPMap());
 
 	for(size_t ipt = 0; ipt < m_DataPoints.size(); ipt++)
 	{
@@ -487,7 +487,8 @@ void Engine::setupFitter()
 
 	m_fitter->init(m_fit_calculator,
                     m_programSettings->getFitConfig().fitParameters,
-                    m_cParameters, m_DataPoints);
+                    m_programSettings->getCPMap(),
+                    m_DataPoints);
 }
 
 void Engine::printFitterInfo(NonlinearFit::NonlinearFitter * fitter)

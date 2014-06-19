@@ -26,8 +26,8 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	double rc_th_edge, rc_th_screw, rc_th_mixed;
 
 	/*reinitialization of correlation radii of threading dislocations*/
-	m_scale = params.find("Calculator.scale")->second;
-	m_background = params.find("Calculator.background")->second;
+	m_scale = params.find("Data.I0")->second;
+	m_background = params.find("Data.Ibg")->second;
 
 	/*
 	 * reinitialization of densities of misfit dislocations
