@@ -345,7 +345,7 @@ void Engine::setupCalculator()
 	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
 	/*transform hexagonal miller indices to vector*/
-	Q_vec = transformator.toVector3d(m_programSettings->getCalculatorSettings().Q);
+	Q_vec = transformator.toVector3d(m_programSettings->getDataConfig().Q);
 	/*get Q in coplanar frame*/
 	Q = toCoplanarFrame(Q_vec, n_vec);
 	/* sign of the first index of Q_vec determines the difference between reflections
@@ -388,11 +388,12 @@ void Engine::setupCalculator()
 					m_programSettings->getSampleConfig().threading_mixed.rc, Q(0), Q(2),
 					m_programSettings->getSampleConfig().nu);
 
-		m_calculator = new ANACalculatorCoplanarTriple(m_sample,
-				m_programSettings->getCalculatorSettings().sampling);
+		m_calculator = new ANACalculatorCoplanarTriple(m_sample, 150
+				/*FIXME : make sampling a part of program settings
+				 m_programSettings->getCalculatorSettings().sampling*/);
 		m_calculator->setResolution(
-				m_programSettings->getCalculatorSettings().qresolX,
-				m_programSettings->getCalculatorSettings().qresolZ);
+				m_programSettings->getDataConfig().resolX,
+				m_programSettings->getDataConfig().resolZ);
 
 		m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculator, m_sample);
 	} catch (std::exception& ex)
