@@ -155,8 +155,10 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 	    }
 	    else
 	    {
-		    threading_mixed.rho = 0.0;
-		    threading_mixed.rc = 0.0;
+		    threading_edge.rho = 0.0;
+		    cmap[threading.getPath() + ".edge.rho"] = threading_edge.rho;
+		    threading_edge.rc = 0.0;
+		    cmap[threading.getPath() + ".edge.rc"] = threading_edge.rc;
 	    }
 
 	    if(threading.exists("screw"))
@@ -171,7 +173,9 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 	    else
 	    {
 		    threading_screw.rho = 0.0;
+            cmap[threading.getPath() + ".screw.rho"] = threading_screw.rho;
 		    threading_screw.rc = 0.0;
+            cmap[threading.getPath() + ".screw.rc"] = threading_screw.rc;
 	    }
 
 	    if(threading.exists("mixed"))
@@ -186,7 +190,9 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 	    else
 	    {
 		    threading_mixed.rho = 0.0;
+		    cmap[threading.getPath() + ".mixed.rho"] = threading_mixed.rho;
 		    threading_mixed.rc = 0.0;
+		    cmap[threading.getPath() + ".mixed.rc"] = threading_mixed.rc;
 	    }
 	}
 }
