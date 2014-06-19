@@ -167,7 +167,7 @@ void Engine::saveResult() const
 {
     boost::filesystem::path filename;
     
-    filename = getFilename();
+    filename = m_WorkDir / getFilename();
 	std::ofstream fout(filename.c_str());
 	if(!fout)
 	{
@@ -209,11 +209,11 @@ void Engine::saveResume() const
 	filename = m_WorkDir / m_programSettings->getResumefile();
 
     fout.open(filename.c_str());
-    fout << "#fparam\t val\n";
-    fout << "#In " << m_fitter->getNbIterations() 
+    fout << "In " << m_fitter->getNbIterations() 
         << " iterations ||f||^2 reduced from "
         << m_fitter->getFinit() << " to " 
         << m_fitter->getFfin() << std::endl;
+    fout << std::endl;
     for (NonlinearFit::FitParameterList::const_iterator it=m_fParametersFinal.begin();
             it!=m_fParametersFinal.end(); ++it)
     {
