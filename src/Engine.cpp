@@ -103,7 +103,6 @@ void Engine::exec(const boost::filesystem::path & workDir)
 	m_programSettings = new ProgramSettings;
 	m_programSettings->read(m_WorkDir);
 
-	m_programSettings->print();
 	init();
 	setupComponents();
 	doWork();

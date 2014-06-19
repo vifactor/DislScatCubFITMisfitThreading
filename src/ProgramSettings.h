@@ -35,19 +35,6 @@ public:
 	private:
 		std::string msg;
 	};
-	struct CalculatorSettings
-	{
-		/*cubic Miller indices*/
-		MillerReciprocalCubIndices Q;
-		/*X-ray wavelength*/
-		double lambda;
-
-		double qresolX, qresolZ;
-		NonlinearFit::FitParameter scale;
-		NonlinearFit::FitParameter background;
-
-		long int sampling;
-	};
 
 	struct DataConfig
 	{
@@ -104,10 +91,6 @@ public:
         void set(const libconfig::Setting&, 
                 NonlinearFit::CalculatorParameterMap&);
 	};
-	/*const CalculatorSettings& getCalculatorSettings() const
-	{
-		return m_calculatorSettings;
-	}*/
 	
 	const SampleConfig& getSampleConfig() const
 	{
@@ -137,16 +120,7 @@ public:
 	virtual ~ProgramSettings(){}
 
 	void read(const boost::filesystem::path& cfgdir);
-	void print() const;
 protected:
-	void readCalculatorSettings(const libconfig::Setting& root);
-
-	void printCalculatorSettings() const;
-
-	void printCoplanarSettings() const;
-
-
-	CalculatorSettings m_calculatorSettings;
 
 	boost::filesystem::path m_cfgfile;
 	boost::filesystem::path m_resfile;

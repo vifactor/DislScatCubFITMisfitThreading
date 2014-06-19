@@ -240,52 +240,6 @@ operator<<(std::ostream& out, const ProgramSettings::SampleConfig &sample)
 	return out;
 }
 
-FitParameter readFParameter(const libconfig::Setting& stg)
-{
-	bool isFit;
-	static FitParameter fparameter;
-
-	if(stg.isScalar())
-	{
-		fparameter.m_Name = stg.getPath();
-		fparameter.m_Value = stg;
-		fparameter.m_Lbvalue = 0.0;
-		fparameter.m_Ubvalue = 0.0;
-	}else if(stg.isGroup())
-	{
-		isFit = stg["tofit"];
-		if(isFit)
-		{
-			fparameter.m_Name = stg.getPath();
-			fparameter.m_Value = stg["value"];
-			fparameter.m_Lbvalue = stg["lbvalue"];
-			fparameter.m_Ubvalue = stg["ubvalue"];
-
-			if(!stg.lookupValue("scvalue", fparameter.m_Scvalue))
-			{
-				fparameter.m_Scvalue = 0.0;
-			}
-
-			if(fparameter.m_Lbvalue >= fparameter.m_Ubvalue)
-			{
-				throw ProgramSettings::Exception("Fault boundaries " + toString(stg.getPath()));
-			}
-		}
-		else
-		{
-			fparameter.m_Name = stg.getPath();
-			fparameter.m_Value = stg["value"];
-			fparameter.m_Lbvalue = 0.0;
-			fparameter.m_Ubvalue = 0.0;
-		}
-	}
-	else
-	{
-		throw ProgramSettings::Exception("Inappropriate type " + toString(stg.getPath()));
-	}
-	return fparameter;
-}
-
 std::ostream& operator<<(std::ostream& out, const FitParameter& fparam)
 {
 	/*variable parameter*/
@@ -307,7 +261,6 @@ ProgramSettings::ProgramSettings()
 
 void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 {
-	libconfig::Config cfg;
 	libconfig::Config samplecfg, datacfg, fitcfg;
 	boost::filesystem::path samplecfgfile, datacfgfile, fitcfgfile;
 	
@@ -318,7 +271,6 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 	// Read the file. If there is an error, report it
 	try
 	{	
-		/*FIXME temporary -----*/
 		samplecfg.readFile(samplecfgfile.c_str());
 		samplecfg.setAutoConvert(true);
 		const libconfig::Setting& sampleroot = samplecfg.getRoot();
@@ -340,13 +292,7 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
         for (CalculatorParameterMap::const_iterator it=m_cpMap.begin();
                 it!=m_cpMap.end(); ++it)
             std::cout << it->first << " => " << it->second << '\n';
-		/*FIXME temporary solution -----*/
 
-        cfg.readFile(m_cfgfile.c_str());
-		cfg.setAutoConvert(true);
-		const libconfig::Setting& root = cfg.getRoot();
-
-		readCalculatorSettings(root);
 	} catch (const libconfig::FileIOException &fioex)
 	{
 		throw Exception(toString(fioex.what()) + " in\t" + m_cfgfile.native());
@@ -367,52 +313,4 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 				toString(tex.what()) + "\t" + toString(tex.getPath()) + " in\t"
 						+ m_cfgfile.native());
 	}
-}
-
-void ProgramSettings::readCalculatorSettings(const libconfig::Setting& root)
-{
-	const libconfig::Setting &calculator = root["Calculator"];
-
-	/*reflection*/
-	if(calculator["Q"].isArray() && calculator["Q"].getLength() 
-	                                               == MillerCubIndicesDimension)
-	{
-		m_calculatorSettings.Q.H = calculator["Q"][0];
-		m_calculatorSettings.Q.K = calculator["Q"][1];
-		m_calculatorSettings.Q.L = calculator["Q"][2];
-	}
-	else
-	{
-		throw ProgramSettings::Exception(toString(calculator["Q"].getPath()));
-	}
-
-
-	/*z-sampling for intensity calculations*/
-	m_calculatorSettings.sampling = calculator["zsampling"];
-
-	/*X-ray wavelength*/
-	m_calculatorSettings.lambda = calculator["lambda"];
-
-	m_calculatorSettings.scale = readFParameter(calculator["scale"]);
-	m_calculatorSettings.background = readFParameter(calculator["background"]);
-
-	m_calculatorSettings.qresolX = calculator["resolution"]["x"];
-	m_calculatorSettings.qresolZ = calculator["resolution"]["z"];
-}
-
-void ProgramSettings::print() const
-{
-	printCalculatorSettings();
-}
-
-void ProgramSettings::printCalculatorSettings() const
-{
-	std::cout << "---Calculator settings---" << std::endl;
-	std::cout << "Reflection:\t" << m_calculatorSettings.Q << std::endl;
-	std::cout << "X-ray wavelength:\t" << m_calculatorSettings.lambda << std::endl;
-	std::cout << "Resolutions (dqx, dqz):\t" << m_calculatorSettings.qresolX
-			<< "\t" << m_calculatorSettings.qresolZ << std::endl;
-	std::cout << "Intensity scale coefficient:\t" << m_calculatorSettings.scale << std::endl;
-	std::cout << "Intensity background:\t" << m_calculatorSettings.background << std::endl;
-	std::cout << "Z sampling:\t" << m_calculatorSettings.sampling << std::endl;
 }
