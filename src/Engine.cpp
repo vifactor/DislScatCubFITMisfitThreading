@@ -159,24 +159,25 @@ void Engine::calcI(std::vector<double>& vals)
 	}
 }
 
-std::string Engine::getFilename() const
+boost::filesystem::path Engine::getFilename() const
 {
-	std::string filename;
-	std::string extension;
+	boost::filesystem::path filename;
 
-	filename = m_programSettings->getEngineSettings().outfile;
-	extension = stripExtension(filename);
-	filename += "_ft";
-	filename += "." + extension;
+	filename = m_programSettings->getDataConfig().file;
+	filename.replace_extension("ft");
 	return filename;
 }
 
 void Engine::saveResult() const
 {
-	std::ofstream fout(getFilename().c_str());
+    boost::filesystem::path filename;
+    
+    filename = getFilename();
+	std::ofstream fout(filename.c_str());
 	if(!fout)
 	{
-		throw Engine::Exception("Unable to open the output file:\t" + getFilename());
+		throw Engine::Exception("Unable to open the output file:\t" +
+		                    filename.native());
 	}
 
 	fout<<"#qx\tqz\tIexp\tIini\tIfin"<<std::endl;
@@ -197,7 +198,8 @@ void Engine::fitI()
 {
 	//carry out fit
 	//with max "calculationSettings.modefitSettings.nbIterations" iterations
-	m_fitter->fit(NonlinearFitter::fitLIN, m_programSettings->getEngineSettings().nb_iter);
+	m_fitter->fit(NonlinearFitter::fitLIN,
+	    m_programSettings->getFitConfig().nbIterations);
 
 	//get new values (best fit values) of fit parameters
 	m_fParametersFinal = m_fitter->getFitParameters();
@@ -211,7 +213,7 @@ void Engine::saveResume() const
 	double rho_screw, rho_edge, rho_mixed,
 		rc_screw, rc_edge, rc_mixed,
 		M_edge, M_screw, M_mixed, rho_misfit;
-	std::string filename;
+	boost::filesystem::path filename;
 	std::ofstream fout, fin;
 
 	rc_edge = m_cParameters.find("Sample.dislocations.threading.edge.rc")->second;
@@ -227,7 +229,7 @@ void Engine::saveResume() const
 	M_edge = rc_edge * sqrt(rho_edge * 1e-14);
 	M_mixed = rc_mixed * sqrt(rho_mixed * 1e-14);
 
-	filename = m_programSettings->getEngineSettings().resumefile;
+	filename = m_WorkDir / m_programSettings->getResumefile();
 
 	fin.open(filename.c_str(), std::ios::in);
 	if(fin.good())
@@ -245,7 +247,7 @@ void Engine::saveResume() const
 				"rho_mixed\trc_mixed\tM_mixed\trho_misfit\n";
 	}
 	fout << m_programSettings->getConfigfile() << "\t";
-	fout << m_programSettings->getEngineSettings().datafile << "\t";
+	fout << m_programSettings->getDataConfig().file << "\t";
 	fout << m_programSettings->getCalculatorSettings().Q.H << "\t" <<
 			m_programSettings->getCalculatorSettings().Q.K << "\t" <<
 			m_programSettings->getCalculatorSettings().Q.L << "\t";
@@ -319,7 +321,7 @@ void Engine::readData()
 	DataReader dr;
 	boost::filesystem::path datapath;
 	
-	datapath = m_WorkDir / m_programSettings->getEngineSettings().datafile;
+	datapath = m_WorkDir / m_programSettings->getDataConfig().file;
 	dr.readFile(datapath.c_str());
 
 	if(!dr.good())
@@ -335,7 +337,7 @@ void Engine::readData()
 	else
 	{
 		throw Engine::Exception("Column \"[intensity]\" has not been found in " +
-				m_programSettings->getEngineSettings().datafile);
+				m_programSettings->getDataConfig().file.native());
 	}
 
 	if (dr.columnExist("[qx]"))
@@ -346,7 +348,7 @@ void Engine::readData()
 	else
 	{
 		throw Engine::Exception("Column \"[qx]\" has not been found in "+
-				m_programSettings->getEngineSettings().datafile);
+				m_programSettings->getDataConfig().file.native());
 	}
 
 	if (dr.columnExist("[qz]"))
@@ -357,7 +359,7 @@ void Engine::readData()
 	else
 	{
 		throw Engine::Exception("Column \"[qz]\" has not been found in "+
-				m_programSettings->getEngineSettings().datafile);
+				m_programSettings->getDataConfig().file.native());
 	}
 
 	/*allocate arguments and residuals*/

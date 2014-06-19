@@ -294,6 +294,11 @@ std::ostream& operator<<(std::ostream& out, const FitParameter& fparam)
 	return out;
 }
 
+ProgramSettings::ProgramSettings()
+{
+    m_resfile = "resume.txt";
+}
+
 void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 {
 	libconfig::Config cfg;

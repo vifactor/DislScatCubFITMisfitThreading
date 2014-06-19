@@ -144,10 +144,10 @@ public:
 	{
 		return m_calculatorSettings;
 	}
-	const EngineSettings& getEngineSettings() const
+	/*const EngineSettings& getEngineSettings() const
 	{
 		return m_engineSettings;
-	}
+	}*/
 	
 	const SampleConfig& getSampleConfig() const
 	{
@@ -169,7 +169,11 @@ public:
 	{
 		return m_cfgfile;
 	}
-	ProgramSettings(){}
+	const boost::filesystem::path& getResumefile() const
+	{
+		return m_resfile;
+	}
+	ProgramSettings();
 	virtual ~ProgramSettings(){}
 
 	void read(const boost::filesystem::path& cfgdir);
@@ -195,11 +199,13 @@ protected:
 	CalculatorSettings m_calculatorSettings;
 	EngineSettings m_engineSettings;
 	boost::filesystem::path m_cfgfile;
+	boost::filesystem::path m_resfile;
 	
 	NonlinearFit::CalculatorParameterMap m_cpMap;
 	SampleConfig m_sampleConfig;
 	DataConfig m_dataConfig;
 	FitConfig m_fitConfig;
+	
 };
 
 #endif /* PROGRAMSETTINGS_H_ */
