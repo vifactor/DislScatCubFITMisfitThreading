@@ -121,8 +121,6 @@ void Engine::init()
 
 	/*vector of fit parameters with their final values*/
 	m_fParametersFinal.clear();
-	/*map of calculator parameters (potential fit parameters)*/
-	m_cParameters.clear();
 
 	m_exp_intens_vals.clear(); m_ini_intens_vals.clear(); m_fin_intens_vals.clear();
 	m_qx_vals.clear(); m_qz_vals.clear();
@@ -153,8 +151,6 @@ void Engine::calcI(std::vector<double>& vals)
 	{
 		I = m_fit_calculator->eval(m_DataPoints[ipt].m_Argument);
 		vals[ipt] = I;
-
-		//std::cout << ipt << "\t" << I << std::endl;
 	}
 }
 
@@ -202,67 +198,28 @@ void Engine::fitI()
 
 	//get new values (best fit values) of fit parameters
 	m_fParametersFinal = m_fitter->getFitParameters();
-
-	//update calc parameters with new fitted values
-	mergeParameters(m_cParameters, m_fParametersFinal);
 }
 
 void Engine::saveResume() const
 {
-	double rho_screw, rho_edge, rho_mixed,
-		rc_screw, rc_edge, rc_mixed,
-		M_edge, M_screw, M_mixed, rho_misfit;
 	boost::filesystem::path filename;
-	std::ofstream fout, fin;
-
-	rc_edge = m_cParameters.find("Sample.dislocations.threading.edge.rc")->second;
-	rc_screw = m_cParameters.find("Sample.dislocations.threading.screw.rc")->second;
-	rc_mixed = m_cParameters.find("Sample.dislocations.threading.mixed.rc")->second;
-	rho_edge = m_cParameters.find("Sample.dislocations.threading.edge.rho")->second;
-	rho_screw = m_cParameters.find("Sample.dislocations.threading.screw.rho")->second;
-	rho_mixed = m_cParameters.find("Sample.dislocations.threading.mixed.rho")->second;
-	rho_misfit = m_cParameters.find("Sample.dislocations.misfit.rho")->second;
+	std::ofstream fout;
 
 	/*transform rc to M = rc/rd = rc*rho^(1/2) */
-	M_screw = rc_screw * sqrt(rho_screw * 1e-14);
-	M_edge = rc_edge * sqrt(rho_edge * 1e-14);
-	M_mixed = rc_mixed * sqrt(rho_mixed * 1e-14);
-
 	filename = m_WorkDir / m_programSettings->getResumefile();
 
-	fin.open(filename.c_str(), std::ios::in);
-	if(fin.good())
-	{
-		fin.close();
-		fout.open(filename.c_str(), std::ios::app);
-	}
-	else
-	{
-		fin.close();
-		fout.open(filename.c_str(), std::ios::out);
-		fout << "#cfg\tdat\tH\tK\tL\t"<<
-				"rho_edge\trc_edge\tM_edge\t" <<
-				"rho_screw\trc_screw\tM_screw\t" <<
-				"rho_mixed\trc_mixed\tM_mixed\trho_misfit\n";
-	}
-	fout << m_programSettings->getConfigfile() << "\t";
-	fout << m_programSettings->getDataConfig().file << "\t";
-	fout << m_programSettings->getCalculatorSettings().Q.H << "\t" <<
-			m_programSettings->getCalculatorSettings().Q.K << "\t" <<
-			m_programSettings->getCalculatorSettings().Q.L << "\t";
-			
-	fout << rho_edge << "\t";
-	fout << rc_edge << "\t";
-	fout << M_edge << "\t";
-	fout << rho_screw << "\t";
-	fout << rc_screw << "\t";
-	fout << M_screw << "\t";
-	fout << rho_mixed << "\t";
-	fout << rc_mixed << "\t";
-	fout << M_mixed << "\t";
-	fout << rho_misfit << "\t";
-	fout << std::endl;
-	fout.close();
+    fout.open(filename.c_str());
+    fout << "#fparam\t val\n";
+    fout << "#In " << m_fitter->getNbIterations() 
+        << " iterations ||f||^2 reduced from "
+        << m_fitter->getFinit() << " to " 
+        << m_fitter->getFfin() << std::endl;
+    for (NonlinearFit::FitParameterList::const_iterator it=m_fParametersFinal.begin();
+            it!=m_fParametersFinal.end(); ++it)
+    {
+        fout << it->m_Name << " => " << it->m_Value << std::endl;
+    }
+    fout.close();
 }
 
 void Engine::saveSettings() const
@@ -310,7 +267,6 @@ void Engine::saveSettings() const
 void Engine::setupComponents()
 {
 	setupCalculator();
-	setupCParameters();
 	readData();
 	setupFitter();
 }
@@ -444,41 +400,6 @@ void Engine::setupCalculator()
 		throw Engine::Exception(
 				"Calculator allocation pb (" + toString(ex.what()) + ")");
 	}
-}
-
-void Engine::setupCParameters()
-{
-	const FitParameter * param;
-	/*scale*/
-	param = &m_programSettings->getCalculatorSettings().scale;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*background*/
-	param = &m_programSettings->getCalculatorSettings().background;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*densities*/
-	/*edge*/
-	param = &m_programSettings->getSampleSettings().threading_edge.rho;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*screw*/
-	param = &m_programSettings->getSampleSettings().threading_screw.rho;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*mixed*/
-	param = &m_programSettings->getSampleSettings().threading_mixed.rho;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*critical radii*/
-	/*edge*/
-	param = &m_programSettings->getSampleSettings().threading_edge.rc;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*screw*/
-	param = &m_programSettings->getSampleSettings().threading_screw.rc;
-	m_cParameters[param->m_Name] = param->m_Value;
-	/*mixed*/
-	param = &m_programSettings->getSampleSettings().threading_mixed.rc;
-	m_cParameters[param->m_Name] = param->m_Value;
-
-	/*misfit*/
-	param = &m_programSettings->getSampleSettings().misfit.rho;
-	m_cParameters[param->m_Name] = param->m_Value;
 }
 
 void Engine::setupFitter()

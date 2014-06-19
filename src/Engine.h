@@ -35,10 +35,8 @@ private:
 	void init();
 	void setupComponents();
 	void setupCalculator();
-	void setupCParameters();
 	void setupFitter();
 	void readData();
-	void fillData();
 
 	void doWork();
 	void calcI(std::vector<double>& pts);
@@ -48,7 +46,6 @@ private:
 	void saveSettings() const;
 	void saveResume() const;
 	void saveResult() const;
-	void saveCalcIntensity() const;
 	void saveFitIntensity() const;
 	void printFitterInfo(NonlinearFit::NonlinearFitter * fitter);
 
@@ -60,8 +57,6 @@ private:
 
 	/*vector of fit parameters with their final values*/
 	NonlinearFit::FitParameterList m_fParametersFinal;
-	/*map of calculator parameters (potential fit parameters)*/
-	NonlinearFit::CalculatorParameterMap m_cParameters;
 
 	std::vector<double> m_qx_vals, m_qz_vals;
 	std::vector<double> m_exp_intens_vals, m_ini_intens_vals, m_fin_intens_vals;

@@ -337,7 +337,8 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 		m_fitConfig.set(fitroot["Fit"], m_cpMap);
 		std::cout << m_fitConfig << std::endl;
 		
-        for (CalculatorParameterMap::iterator it=m_cpMap.begin(); it!=m_cpMap.end(); ++it)
+        for (CalculatorParameterMap::const_iterator it=m_cpMap.begin();
+                it!=m_cpMap.end(); ++it)
             std::cout << it->first << " => " << it->second << '\n';
 		/*FIXME temporary solution -----*/
 
