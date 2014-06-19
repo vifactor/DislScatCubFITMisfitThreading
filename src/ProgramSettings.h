@@ -35,32 +35,6 @@ public:
 	private:
 		std::string msg;
 	};
-	struct SampleSettings
-	{
-		double nu;
-		double thickness;
-		double width;
-		/*hexagonal lattice parameters*/
-		double a0;
-
-		struct MisfitDislocationType
-		{
-			/*burgers components*/
-			MillerDirectCubIndices b, l;
-			NonlinearFit::FitParameter rho;
-		};
-		struct ThreadingDislocationType
-		{
-			double b_edge, b_screw;
-			NonlinearFit::FitParameter rho;
-			NonlinearFit::FitParameter rc;
-		};
-
-		MisfitDislocationType misfit;
-		ThreadingDislocationType threading_edge;
-		ThreadingDislocationType threading_screw;
-		ThreadingDislocationType threading_mixed;
-	};
 	struct CalculatorSettings
 	{
 		/*cubic Miller indices*/
@@ -130,10 +104,6 @@ public:
         void set(const libconfig::Setting&, 
                 NonlinearFit::CalculatorParameterMap&);
 	};
-	/*const SampleSettings& getSampleSettings() const
-	{
-		return m_sampleSettings;
-	}*/
 	const CalculatorSettings& getCalculatorSettings() const
 	{
 		return m_calculatorSettings;
@@ -170,20 +140,12 @@ public:
 	void print() const;
 protected:
 	void readCalculatorSettings(const libconfig::Setting& root);
-	void readSampleSettings(const libconfig::Setting& root);
 
-	void readMisfitDislocations(const libconfig::Setting& stg);
-	void readThreadingDislocations(const libconfig::Setting& stg);
-
-	void printSampleSettings() const;
 	void printCalculatorSettings() const;
 
 	void printCoplanarSettings() const;
 
-	void printMisfitDislocations() const;
-	void printThreadingDislocations() const;
 
-	SampleSettings m_sampleSettings;
 	CalculatorSettings m_calculatorSettings;
 
 	boost::filesystem::path m_cfgfile;
