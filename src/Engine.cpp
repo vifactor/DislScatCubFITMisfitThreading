@@ -118,8 +118,7 @@ void Engine::init()
 		delete m_fit_calculator;
 	if(m_fitter)
 		delete m_fitter;
-	/*vector of fit parameters with their initial values*/
-	m_fParametersInit.clear();
+
 	/*vector of fit parameters with their final values*/
 	m_fParametersFinal.clear();
 	/*map of calculator parameters (potential fit parameters)*/
@@ -447,64 +446,48 @@ void Engine::setupCalculator()
 	}
 }
 
-void Engine::addFParameter(const FitParameter & param)
-{
-	if (param.m_Lbvalue != param.m_Ubvalue)
-	{
-		m_fParametersInit.push_back(param);
-	}
-}
-
 void Engine::setupCParameters()
 {
 	const FitParameter * param;
 	/*scale*/
 	param = &m_programSettings->getCalculatorSettings().scale;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*background*/
 	param = &m_programSettings->getCalculatorSettings().background;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*densities*/
 	/*edge*/
 	param = &m_programSettings->getSampleSettings().threading_edge.rho;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*screw*/
 	param = &m_programSettings->getSampleSettings().threading_screw.rho;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*mixed*/
 	param = &m_programSettings->getSampleSettings().threading_mixed.rho;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*critical radii*/
 	/*edge*/
 	param = &m_programSettings->getSampleSettings().threading_edge.rc;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*screw*/
 	param = &m_programSettings->getSampleSettings().threading_screw.rc;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 	/*mixed*/
 	param = &m_programSettings->getSampleSettings().threading_mixed.rc;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 
 	/*misfit*/
 	param = &m_programSettings->getSampleSettings().misfit.rho;
 	m_cParameters[param->m_Name] = param->m_Value;
-	addFParameter(*param);
 }
 
 void Engine::setupFitter()
 {
 	m_fitter = new PortFitter;
-	std::cout << "nb FitParameters:\t" << m_fParametersInit.size() << std::endl;
 
-	m_fitter->init(m_fit_calculator, m_fParametersInit, m_cParameters, m_DataPoints);
+	m_fitter->init(m_fit_calculator,
+                    m_programSettings->getFitConfig().fitParameters,
+                    m_cParameters, m_DataPoints);
 }
 
 void Engine::printFitterInfo(NonlinearFit::NonlinearFitter * fitter)

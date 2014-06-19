@@ -37,7 +37,6 @@ private:
 	void setupCalculator();
 	void setupCParameters();
 	void setupFitter();
-	void addFParameter(const NonlinearFit::FitParameter & param);
 	void readData();
 	void fillData();
 
@@ -59,8 +58,6 @@ private:
 	NonlinearFit::NonlinearFitter * m_fitter;
 	ProgramSettings * m_programSettings;
 
-	/*vector of fit parameters with their initial values*/
-	NonlinearFit::FitParameterList m_fParametersInit;
 	/*vector of fit parameters with their final values*/
 	NonlinearFit::FitParameterList m_fParametersFinal;
 	/*map of calculator parameters (potential fit parameters)*/
