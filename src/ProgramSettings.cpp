@@ -341,7 +341,6 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 
 		readSampleSettings(root);
 		readCalculatorSettings(root);
-		readEngineSettings(root);
 	} catch (const libconfig::FileIOException &fioex)
 	{
 		throw Exception(toString(fioex.what()) + " in\t" + m_cfgfile.native());
@@ -499,23 +498,8 @@ void ProgramSettings::readThreadingDislocations(const libconfig::Setting& stg)
 	}
 }
 
-void ProgramSettings::readEngineSettings(const libconfig::Setting& root)
-{
-	const libconfig::Setting &engine = root["Engine"];
-
-	/*output basename*/
-	m_engineSettings.outfile = engine["outfile"].c_str();
-	/*data file*/
-	m_engineSettings.datafile = engine["datafile"].c_str();
-	/*resume file*/
-	m_engineSettings.resumefile = engine["resumefile"].c_str();
-	/*max nb of iterations for fit*/
-	m_engineSettings.nb_iter = engine["nbIterations"];
-}
-
 void ProgramSettings::print() const
 {
-	printEngineSettings();
 	printSampleSettings();
 	printCalculatorSettings();
 }
@@ -547,16 +531,6 @@ void ProgramSettings::printSampleSettings() const
 	std::cout << "Threading dislocations:" << std::endl;
 	printThreadingDislocations();
 
-}
-
-void ProgramSettings::printEngineSettings() const
-{
-	std::cout << "---Engine settings---" << std::endl;
-
-	std::cout << "Data file:\t" << m_engineSettings.datafile << std::endl;
-	std::cout << "Resume file:\t" << m_engineSettings.outfile << std::endl;
-	std::cout << "Output basename:\t" << m_engineSettings.outfile << std::endl;
-	std::cout << "Nb fit iterations:\t" << m_engineSettings.nb_iter << std::endl;
 }
 
 void ProgramSettings::printMisfitDislocations() const

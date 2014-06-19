@@ -74,13 +74,7 @@ public:
 
 		long int sampling;
 	};
-	struct EngineSettings
-	{
-		std::string outfile;
-		std::string datafile;
-		std::string resumefile;
-		int nb_iter;
-	};
+
 	struct DataConfig
 	{
         MillerReciprocalCubIndices Q;
@@ -144,10 +138,6 @@ public:
 	{
 		return m_calculatorSettings;
 	}
-	/*const EngineSettings& getEngineSettings() const
-	{
-		return m_engineSettings;
-	}*/
 	
 	const SampleConfig& getSampleConfig() const
 	{
@@ -181,14 +171,12 @@ public:
 protected:
 	void readCalculatorSettings(const libconfig::Setting& root);
 	void readSampleSettings(const libconfig::Setting& root);
-	void readEngineSettings(const libconfig::Setting& root);
 
 	void readMisfitDislocations(const libconfig::Setting& stg);
 	void readThreadingDislocations(const libconfig::Setting& stg);
 
 	void printSampleSettings() const;
 	void printCalculatorSettings() const;
-	void printEngineSettings() const;
 
 	void printCoplanarSettings() const;
 
@@ -197,7 +185,7 @@ protected:
 
 	SampleSettings m_sampleSettings;
 	CalculatorSettings m_calculatorSettings;
-	EngineSettings m_engineSettings;
+
 	boost::filesystem::path m_cfgfile;
 	boost::filesystem::path m_resfile;
 	
