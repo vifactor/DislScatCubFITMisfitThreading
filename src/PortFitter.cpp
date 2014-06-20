@@ -172,7 +172,7 @@ void PortFitter::fit(FitType type, int nbit)
 		//reset defaults
 		divset_(&kind, iv_ptr, &liv, &lv, v_ptr);
 		//turn of output
-		iv_ptr[ivPRUNIT] = 1;
+		iv_ptr[ivPRUNIT] = 0;
 		//max iterations allowed
 		iv_ptr[ivMXITER] = 0;
 
