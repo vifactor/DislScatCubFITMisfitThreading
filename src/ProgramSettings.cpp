@@ -262,28 +262,27 @@ ProgramSettings::ProgramSettings()
 void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 {
 	libconfig::Config samplecfg, datacfg, fitcfg;
-	boost::filesystem::path samplecfgfile, datacfgfile, fitcfgfile;
 	
 	m_cfgfile = cfgdir / "default.cfg";
-	samplecfgfile = cfgdir / "sample.cfg";
-	datacfgfile = cfgdir / "data.cfg";
-	fitcfgfile = cfgdir / "fit.cfg";
+	m_samfile = cfgdir / "sample.cfg";
+	m_datfile = cfgdir / "data.cfg";
+	m_fitfile = cfgdir / "fit.cfg";
 	// Read the file. If there is an error, report it
 	try
 	{	
-		samplecfg.readFile(samplecfgfile.c_str());
+		samplecfg.readFile(m_samfile.c_str());
 		samplecfg.setAutoConvert(true);
 		const libconfig::Setting& sampleroot = samplecfg.getRoot();
 		m_sampleConfig.set(sampleroot["Sample"], m_cpMap);
 		std::cout << m_sampleConfig << std::endl;
 		
-		datacfg.readFile(datacfgfile.c_str());
+		datacfg.readFile(m_datfile.c_str());
 		datacfg.setAutoConvert(true);
 		const libconfig::Setting& dataroot = datacfg.getRoot();
 		m_dataConfig.set(dataroot["Data"], m_cpMap);
 		std::cout << m_dataConfig << std::endl;
 		
-		fitcfg.readFile(fitcfgfile.c_str());
+		fitcfg.readFile(m_fitfile.c_str());
 		fitcfg.setAutoConvert(true);
 		const libconfig::Setting& fitroot = fitcfg.getRoot();
 		m_fitConfig.set(fitroot["Fit"], m_cpMap);

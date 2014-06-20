@@ -107,6 +107,10 @@ void Engine::exec(const boost::filesystem::path & workDir)
 	setupComponents();
 	doWork();
 	saveResult();
+	
+	//update configuration files
+	updateConfigFile(m_programSettings->getSampleConfigFile());
+	updateConfigFile(m_programSettings->getDataConfigFile());
 }
 
 void Engine::init()
@@ -137,7 +141,6 @@ void Engine::doWork()
 	fitI();
 	printFitterInfo(m_fitter);
 	calcI(m_fin_intens_vals);
-	//saveSettings();
 }
 
 void Engine::calcI(std::vector<double>& vals)
@@ -221,30 +224,30 @@ void Engine::saveResume() const
     fout.close();
 }
 
-void Engine::saveSettings() const
+void Engine::updateConfigFile(const boost::filesystem::path & cfgfile) const
 {
 	libconfig::Config cfg;
-	boost::filesystem::path oldcfgfile, newcfgfile;
+	boost::filesystem::path oldcfgfile;
 
-	oldcfgfile = m_programSettings->getConfigfile();
+	oldcfgfile = cfgfile;
 	oldcfgfile.replace_extension(".~cfg");
-	newcfgfile = m_programSettings->getConfigfile();
 	/*save old configuration in a file with extension ~cfg*/
-	boost::filesystem::rename(newcfgfile, oldcfgfile);
+	boost::filesystem::rename(cfgfile, oldcfgfile);
 
 	try
 	{
 		// Read the configuration file. If there is an error, report it
 		cfg.readFile(oldcfgfile.c_str());
 
-		//reset configuration putting the new fitted values from fitParameterListFinal
-		//for(auto fparameter : fitParameterListFinal)
+		//reset configuration putting the new fitted values from m_fParametersFinal
 		for(size_t i = 0; i < m_fParametersFinal.size(); ++i)
 		{
-			cfg.lookup(m_fParametersFinal[i].m_Name + ".value") = m_fParametersFinal[i].m_Value;
+		    if(cfg.exists(m_fParametersFinal[i].m_Name))    
+                cfg.lookup(m_fParametersFinal[i].m_Name) = 
+                                                m_fParametersFinal[i].m_Value;
 		}
 		//save new configuration
-		cfg.writeFile (newcfgfile.c_str());
+		cfg.writeFile (cfgfile.c_str());
 	} catch (const libconfig::FileIOException &fioex)
 	{
 		throw Engine::Exception("I/O error while reading file:\t" + oldcfgfile.native());

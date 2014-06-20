@@ -43,7 +43,7 @@ private:
 	void fitI();
 
 	boost::filesystem::path getFilename() const;
-	void saveSettings() const;
+	void updateConfigFile(const boost::filesystem::path & filename) const;
 	void saveResume() const;
 	void saveResult() const;
 	void saveFitIntensity() const;

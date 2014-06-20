@@ -117,6 +117,18 @@ public:
 	{
 		return m_cfgfile;
 	}
+	const boost::filesystem::path& getDataConfigFile() const
+	{
+		return m_datfile;
+	}
+		const boost::filesystem::path& getFitConfigFile() const
+	{
+		return m_fitfile;
+	}
+	const boost::filesystem::path& getSampleConfigFile() const
+	{
+		return m_samfile;
+	}
 	const boost::filesystem::path& getResumefile() const
 	{
 		return m_resfile;
@@ -129,6 +141,9 @@ protected:
 
 	boost::filesystem::path m_cfgfile;
 	boost::filesystem::path m_resfile;
+	boost::filesystem::path m_datfile;
+	boost::filesystem::path m_samfile;
+	boost::filesystem::path m_fitfile;
 	
 	NonlinearFit::CalculatorParameterMap m_cpMap;
 	SampleConfig m_sampleConfig;
