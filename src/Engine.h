@@ -50,7 +50,7 @@ private:
 	void printFitterInfo(NonlinearFit::NonlinearFitter * fitter);
 
 	ANASampleCub  * m_sample;
-	ANACalculatorCoplanarTriple *  m_calculator;
+	std::vector<ANACalculatorCoplanarTriple *>  m_calculators;
 	FitANACalculatorCoplanarTriple *  m_fit_calculator;
 	NonlinearFit::NonlinearFitter * m_fitter;
 	ProgramSettings * m_programSettings;

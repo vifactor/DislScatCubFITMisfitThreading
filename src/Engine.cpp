@@ -70,7 +70,6 @@ double toMisfitInPlaneAngle(const Vector3d& Q, const Vector3d& burgers,
 /*----------- end handy functions -----------*/
 Engine::Engine()
 {
-	m_calculator = NULL;
 	m_fitter = NULL;
 	m_programSettings = NULL;
 	m_fit_calculator = NULL;
@@ -81,19 +80,8 @@ Engine::~Engine()
 {
 	if(m_programSettings)
 		delete m_programSettings;
-	if(m_calculator)
-		delete m_calculator;
-	if(m_fit_calculator)
-		delete m_fit_calculator;
-	if(m_fitter)
-		delete m_fitter;
-	if(m_sample)
-		delete m_sample;
-	for(size_t i = 0; i < m_DataPoints.size(); ++i)
-	{
-		if(m_DataPoints[i].m_Argument)
-			delete m_DataPoints[i].m_Argument;
-	}
+
+    init();
 }
 
 void Engine::exec(const boost::filesystem::path & workDir)
@@ -115,8 +103,11 @@ void Engine::exec(const boost::filesystem::path & workDir)
 
 void Engine::init()
 {
-	if(m_calculator)
-		delete m_calculator;
+	for(size_t i = 0; i < m_calculators.size(); ++i)
+	{
+        if(m_calculators[i])
+            delete m_calculators[i];
+	}
 	if(m_fit_calculator)
 		delete m_fit_calculator;
 	if(m_fitter)
@@ -330,7 +321,8 @@ void Engine::readData()
 				NonlinearFit::DataPoint(
 				        new ANACalculatorCoplanarTripleArgument(
 				            m_qx_vals[i], m_qz_vals[i],
-				            m_calculator),
+				            0 //FIXME
+				            ),
 						m_exp_intens_vals[i]));
 	}
 
@@ -397,14 +389,14 @@ void Engine::setupCalculator()
 					m_programSettings->getSampleConfig().threading_mixed.rc, Q(0), Q(2),
 					m_programSettings->getSampleConfig().nu);
 
-		m_calculator = new ANACalculatorCoplanarTriple(m_sample, 150
+		m_calculators.push_back(new ANACalculatorCoplanarTriple(m_sample, 150
 				/*FIXME : make sampling a part of program settings
-				 m_programSettings->getCalculatorSettings().sampling*/);
-		m_calculator->setResolution(
+				 m_programSettings->getCalculatorSettings().sampling*/));
+		m_calculators.back()->setResolution(
 				m_programSettings->getDataConfig().resolX,
 				m_programSettings->getDataConfig().resolZ);
 
-		m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculator, m_sample);
+		m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculators, m_sample);
 	} catch (std::exception& ex)
 	{
 		throw Engine::Exception(

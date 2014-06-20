@@ -7,13 +7,15 @@
 
 #include "FitANACalculatorCoplanarTriple.h"
 
-FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator,
+FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(
+                    const std::vector<ANACalculatorCoplanarTriple *>& calculators,
                     ANASampleCub * sample)
 {
-	m_calculator = calculator;
 	m_sample = sample;
-	m_background = 0.0;
-	m_scale = 1.0;
+	
+	m_calculators = calculators;
+	m_backgrounds.resize(m_calculators.size());
+	m_scales.resize(m_calculators.size());
 }
 
 void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParameterMap& params)
@@ -21,10 +23,11 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	double rho_mf;
 	double rho_th_edge, rho_th_screw, rho_th_mixed;
 	double rc_th_edge, rc_th_screw, rc_th_mixed;
+	int id = 0;//FIXME
 
 	/*reinitialization of correlation radii of threading dislocations*/
-	m_scale = params.find("Data.I0")->second;
-	m_background = params.find("Data.Ibg")->second;
+	m_scales[id] = params.find("Data.I0")->second;
+	m_backgrounds[id] = params.find("Data.Ibg")->second;
 
 	/*
 	 * reinitialization of densities of misfit dislocations
@@ -49,7 +52,7 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	rc_th_screw = params.find("Sample.dislocations.threading.screw.rc")->second;
 	rc_th_mixed = params.find("Sample.dislocations.threading.mixed.rc")->second;
 
-	std::cout << "scale:\t" << m_scale << std::endl;
+	std::cout << "scale:\t" << m_scales[id] << std::endl;
 	std::cout << "rho_mf:\t" << rho_mf << std::endl;
 
 	/*std::cout << "rho_th_edge:\t" << rho_th_edge << std::endl;
@@ -64,20 +67,19 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	m_sample->resetThreadingLayer(1, rho_th_screw, rc_th_screw);
 	m_sample->resetThreadingLayer(2, rho_th_mixed, rc_th_mixed);
 
-	m_calculator->setSample(m_sample);
+	m_calculators[0]->setSample(m_sample);
 }
 
 double FitANACalculatorCoplanarTriple::eval(const NonlinearFit::CalculatorArgument * arg)
 {
 	static double qx, qz, result;
-	ANACalculatorCoplanarTriple * calculator;
+	static int id;
 
 	qx = static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_qx;
 	qz = static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_qz;
-	calculator = 
-	    static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_calculator;
+	id = static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_id;
 
-	result = m_scale * calculator->I(qx, qz) + m_background;
+	result = m_scales[id] * m_calculators[id]->I(qx, qz) + m_backgrounds[id];
 
 	return result;
 }
