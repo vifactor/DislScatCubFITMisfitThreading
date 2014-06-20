@@ -9,11 +9,11 @@
 #ifndef PROGRAMSETTINGS_H_
 #define PROGRAMSETTINGS_H_
 
-#include "StringTools.h"
 #include "NonlinearFit.h"
 #include <MillerIndexCub.h>
 #include <libconfig.h++>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 
 class ProgramSettings
 {

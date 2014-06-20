@@ -7,6 +7,7 @@
 
 #include "ProgramSettings.h"
 using namespace NonlinearFit;
+using namespace boost;
 
 /*----- Data settings -----*/
 void 
@@ -121,8 +122,8 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 		    misfit.b.Z = dislocations["misfit"]["b"][2];
 		}
 		else
-		    throw ProgramSettings::Exception(toString(
-		                            dislocations["misfit"]["b"].getPath()));
+		    throw ProgramSettings::Exception(
+		                            dislocations["misfit"]["b"].getPath());
 		/*dislocation line*/
 	    if(dislocations["misfit"]["l"].isArray() && 
 	       dislocations["misfit"]["l"].getLength() 
@@ -259,10 +260,10 @@ ProgramSettings::ProgramSettings()
     m_resfile = "resume.txt";
 }
 
-void ProgramSettings::read(const boost::filesystem::path& cfgdir)
+void ProgramSettings::read(const filesystem::path& cfgdir)
 {
 	libconfig::Config samplecfg, datacfg, fitcfg;
-	boost::filesystem::path filename; 
+	filesystem::path filename; 
 	
 	m_samfile = cfgdir / "sample.cfg";
 	m_datfile = cfgdir / "data.cfg";
@@ -297,22 +298,26 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 
 	} catch (const libconfig::FileIOException &fioex)
 	{
-		throw Exception(toString(fioex.what()) + " in\t" + filename.native());
+		throw Exception(lexical_cast<std::string>(fioex.what()) 
+		                + " in\t" + filename.native());
 	} catch (const libconfig::ParseException &pex)
 	{
 		throw Exception(
-				toString(pex.what()) + " in\t" + filename.native() + ":"
-						+ toString(pex.getLine()) + " - "
-						+ toString(pex.getError()));
+				lexical_cast<std::string>(pex.what()) + " in\t" 
+				+ filename.native() + ":"
+						+ lexical_cast<std::string>(pex.getLine()) + " - "
+						+ lexical_cast<std::string>(pex.getError()));
 	} catch (const libconfig::SettingNotFoundException &nfex)
 	{
 		throw Exception(
-				toString(nfex.what()) + "\t" + toString(nfex.getPath())
+				lexical_cast<std::string>(nfex.what()) + "\t" 
+				+ lexical_cast<std::string>(nfex.getPath())
 						+ " in\t" + filename.native());
 	} catch (libconfig::SettingTypeException& tex)
 	{
 		throw Exception(
-				toString(tex.what()) + "\t" + toString(tex.getPath()) + " in\t"
+				lexical_cast<std::string>(tex.what()) + "\t"
+				+ lexical_cast<std::string>(tex.getPath()) + " in\t"
 						+ filename.native());
 	}
 }
