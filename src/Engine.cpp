@@ -200,6 +200,10 @@ void Engine::fitI()
 
 	//get new values (best fit values) of fit parameters
 	m_fParametersFinal = m_fitter->getFitParameters();
+	
+	/*update cpMap parameters with newly fitted values*/
+	mergeParameters(m_programSettings->getCPMap(),
+		m_fParametersFinal);
 }
 
 void Engine::saveResume() const

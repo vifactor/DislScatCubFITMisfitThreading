@@ -113,6 +113,10 @@ public:
 	{
 	    return m_cpMap;
 	}
+	NonlinearFit::CalculatorParameterMap& getCPMap()
+	{
+	    return m_cpMap;
+	}
 	const boost::filesystem::path& getDataConfigFile() const
 	{
 		return m_datfile;
