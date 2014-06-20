@@ -262,27 +262,30 @@ ProgramSettings::ProgramSettings()
 void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 {
 	libconfig::Config samplecfg, datacfg, fitcfg;
+	boost::filesystem::path filename; 
 	
-	m_cfgfile = cfgdir / "default.cfg";
 	m_samfile = cfgdir / "sample.cfg";
 	m_datfile = cfgdir / "data.cfg";
 	m_fitfile = cfgdir / "fit.cfg";
 	// Read the file. If there is an error, report it
 	try
 	{	
-		samplecfg.readFile(m_samfile.c_str());
+	    filename = m_samfile;
+		samplecfg.readFile(filename.c_str());
 		samplecfg.setAutoConvert(true);
 		const libconfig::Setting& sampleroot = samplecfg.getRoot();
 		m_sampleConfig.set(sampleroot["Sample"], m_cpMap);
 		std::cout << m_sampleConfig << std::endl;
 		
-		datacfg.readFile(m_datfile.c_str());
+		filename = m_datfile;
+		datacfg.readFile(filename.c_str());
 		datacfg.setAutoConvert(true);
 		const libconfig::Setting& dataroot = datacfg.getRoot();
 		m_dataConfig.set(dataroot["Data"], m_cpMap);
 		std::cout << m_dataConfig << std::endl;
 		
-		fitcfg.readFile(m_fitfile.c_str());
+		filename = m_fitfile;
+		fitcfg.readFile(filename.c_str());
 		fitcfg.setAutoConvert(true);
 		const libconfig::Setting& fitroot = fitcfg.getRoot();
 		m_fitConfig.set(fitroot["Fit"], m_cpMap);
@@ -290,26 +293,26 @@ void ProgramSettings::read(const boost::filesystem::path& cfgdir)
 		
         for (CalculatorParameterMap::const_iterator it=m_cpMap.begin();
                 it!=m_cpMap.end(); ++it)
-            std::cout << it->first << " => " << it->second << '\n';
+            std::cout << it->first << " => " << it->second << std::endl;
 
 	} catch (const libconfig::FileIOException &fioex)
 	{
-		throw Exception(toString(fioex.what()) + " in\t" + m_cfgfile.native());
+		throw Exception(toString(fioex.what()) + " in\t" + filename.native());
 	} catch (const libconfig::ParseException &pex)
 	{
 		throw Exception(
-				toString(pex.what()) + " in\t" + m_cfgfile.native() + ":"
+				toString(pex.what()) + " in\t" + filename.native() + ":"
 						+ toString(pex.getLine()) + " - "
 						+ toString(pex.getError()));
 	} catch (const libconfig::SettingNotFoundException &nfex)
 	{
 		throw Exception(
 				toString(nfex.what()) + "\t" + toString(nfex.getPath())
-						+ " in\t" + m_cfgfile.native());
+						+ " in\t" + filename.native());
 	} catch (libconfig::SettingTypeException& tex)
 	{
 		throw Exception(
 				toString(tex.what()) + "\t" + toString(tex.getPath()) + " in\t"
-						+ m_cfgfile.native());
+						+ filename.native());
 	}
 }

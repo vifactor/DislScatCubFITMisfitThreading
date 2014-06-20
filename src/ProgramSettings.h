@@ -113,10 +113,6 @@ public:
 	{
 	    return m_cpMap;
 	}
-	const boost::filesystem::path& getConfigfile() const
-	{
-		return m_cfgfile;
-	}
 	const boost::filesystem::path& getDataConfigFile() const
 	{
 		return m_datfile;
@@ -139,7 +135,6 @@ public:
 	void read(const boost::filesystem::path& cfgdir);
 protected:
 
-	boost::filesystem::path m_cfgfile;
 	boost::filesystem::path m_resfile;
 	boost::filesystem::path m_datfile;
 	boost::filesystem::path m_samfile;
