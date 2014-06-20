@@ -7,16 +7,13 @@
 
 #include "FitANACalculatorCoplanarTriple.h"
 
-FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator, ANASampleCub * sample)
+FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator,
+                    ANASampleCub * sample)
 {
 	m_calculator = calculator;
 	m_sample = sample;
 	m_background = 0.0;
 	m_scale = 1.0;
-}
-
-FitANACalculatorCoplanarTriple::~FitANACalculatorCoplanarTriple()
-{
 }
 
 void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParameterMap& params)
@@ -73,11 +70,14 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 double FitANACalculatorCoplanarTriple::eval(const NonlinearFit::CalculatorArgument * arg)
 {
 	static double qx, qz, result;
+	ANACalculatorCoplanarTriple * calculator;
 
 	qx = static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_qx;
 	qz = static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_qz;
+	calculator = 
+	    static_cast<const ANACalculatorCoplanarTripleArgument* >(arg)->m_calculator;
 
-	result = m_scale * m_calculator->I(qx, qz) + m_background;
+	result = m_scale * calculator->I(qx, qz) + m_background;
 
 	return result;
 }

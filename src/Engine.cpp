@@ -323,7 +323,10 @@ void Engine::readData()
 	for(size_t i = 0; i < m_exp_intens_vals.size(); ++i)
 	{
 		m_DataPoints.push_back(
-				NonlinearFit::DataPoint(new ANACalculatorCoplanarTripleArgument(m_qx_vals[i], m_qz_vals[i]),
+				NonlinearFit::DataPoint(
+				        new ANACalculatorCoplanarTripleArgument(
+				            m_qx_vals[i], m_qz_vals[i],
+				            m_calculator),
 						m_exp_intens_vals[i]));
 	}
 

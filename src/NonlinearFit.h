@@ -73,7 +73,11 @@ public:
 protected:
 };
 
-void mergeParameters(CalculatorParameterMap& cParameters, const FitParameterList& fParameters);
+/* setups all values of cParameters having names 
+ * from fParameters equal to their values
+ */
+void mergeParameters(CalculatorParameterMap& cParameters,
+                     const FitParameterList& fParameters);
 
 class NonlinearFitter
 {

@@ -22,29 +22,29 @@ public:
 
 	virtual void setResolution(double fwhm_qx, double fwhm_qz);
 	virtual void setSample(const ANASampleCub * sample) {m_sample = sample;}
-	virtual double I(const double qx, const double qz);
-	virtual double I(const double qx, const double qz, double & error);
+	virtual double I(const double qx, const double qz) const;
+	virtual double I(const double qx, const double qz, double & error) const;
 
 	friend double ana_coplanar_triple_integrand_xz1(double x, void *params);
 protected:
 	const ANASampleCub * m_sample;
 
-	double m_qx, m_qz;
+	mutable double m_qx, m_qz;
 	double m_resol2_x, m_resol2_z;
 
 	size_t m_sampling;
-	double * m_z1, * m_integrand_values;
+	mutable double * m_z1, * m_integrand_values;
 
-	void prepare(double z1);
+	void prepare(double z1) const;
 	inline double T_threading(double x) const;
 
-	double m_scale, m_coefficient, m_frequency;
+	mutable double m_scale, m_coefficient, m_frequency;
 
 	/*gsl integration staff*/
 	gsl_integration_workspace * m_workspace;
 	gsl_integration_workspace * m_cyclic_workspace;
 	gsl_integration_qawo_table * m_qawo_table;
-	gsl_function m_function;
+	mutable gsl_function m_function;
 	size_t m_limit;
 	double m_a, m_epsabs;
 

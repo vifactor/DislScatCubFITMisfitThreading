@@ -14,9 +14,16 @@
 class ANACalculatorCoplanarTripleArgument : public NonlinearFit::CalculatorArgument
 {
 public:
-	ANACalculatorCoplanarTripleArgument(double qx = 0, double qz = 0) {m_qx = qx; m_qz = qz;}
+	ANACalculatorCoplanarTripleArgument(double qx, double qz,
+	                                    ANACalculatorCoplanarTriple * calculator)
+	{
+	    m_qx = qx; m_qz = qz;
+	    m_calculator = calculator;
+	}
 	virtual ~ANACalculatorCoplanarTripleArgument() {}
+	
 	double m_qx, m_qz;
+	ANACalculatorCoplanarTriple * m_calculator;
 };
 
 class FitANACalculatorCoplanarTriple:
@@ -24,7 +31,7 @@ class FitANACalculatorCoplanarTriple:
 {
 public:
 	FitANACalculatorCoplanarTriple(ANACalculatorCoplanarTriple * calculator, ANASampleCub * sample);
-	virtual ~FitANACalculatorCoplanarTriple();
+	virtual ~FitANACalculatorCoplanarTriple() {}
 	virtual void reinit(const NonlinearFit::CalculatorParameterMap& params);
 	virtual double eval(const NonlinearFit::CalculatorArgument * arg);
 protected:

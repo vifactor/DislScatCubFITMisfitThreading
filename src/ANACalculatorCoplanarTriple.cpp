@@ -101,7 +101,8 @@ double ANACalculatorCoplanarTriple::T_threading(double x) const
 	return result;
 }
 
-double ANACalculatorCoplanarTriple::I(const double qx, const double qz, double & err)
+double
+ANACalculatorCoplanarTriple::I(const double qx, const double qz, double & err) const
 {
 	static double result, abserr;
 
@@ -133,7 +134,7 @@ double ANACalculatorCoplanarTriple::I(const double qx, const double qz, double &
 	return result;
 }
 
-double ANACalculatorCoplanarTriple::I(const double qx, const double qz)
+double ANACalculatorCoplanarTriple::I(const double qx, const double qz) const
 {
 	static double result, abserr;
 
@@ -142,7 +143,7 @@ double ANACalculatorCoplanarTriple::I(const double qx, const double qz)
 	return result;
 }
 
-void ANACalculatorCoplanarTriple::prepare(double z1)
+void ANACalculatorCoplanarTriple::prepare(double z1) const
 {
 	static double wxx, wxz, wzz;
 
