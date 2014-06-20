@@ -101,9 +101,13 @@ public:
 	{
 		return m_sampleConfig;
 	}
-	const DataConfig& getDataConfig() const
+	const std::vector<DataConfig>& getDataConfig() const
 	{
 		return m_dataConfig;
+	}
+	const DataConfig& getDataConfig(size_t i) const
+	{
+		return m_dataConfig[i];
 	}
 	const FitConfig& getFitConfig() const
 	{
@@ -146,7 +150,7 @@ protected:
 	
 	NonlinearFit::CalculatorParameterMap m_cpMap;
 	SampleConfig m_sampleConfig;
-	DataConfig m_dataConfig;
+	std::vector<DataConfig> m_dataConfig;
 	FitConfig m_fitConfig;
 	
 };

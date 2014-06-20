@@ -42,7 +42,8 @@ private:
 	void calcI(std::vector<double>& pts);
 	void fitI();
 
-	boost::filesystem::path getFilename() const;
+	boost::filesystem::path getOutFilename(
+	                const boost::filesystem::path & filename) const;
 	void updateConfigFile(const boost::filesystem::path & filename) const;
 	void saveResume() const;
 	void saveResult() const;

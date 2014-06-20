@@ -26,8 +26,8 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	int id = 0;//FIXME
 
 	/*reinitialization of correlation radii of threading dislocations*/
-	m_scales[id] = params.find("Data.I0")->second;
-	m_backgrounds[id] = params.find("Data.Ibg")->second;
+	m_scales[id] = params.find("Data.[0].I0")->second;
+	m_backgrounds[id] = params.find("Data.[0].Ibg")->second;
 
 	/*
 	 * reinitialization of densities of misfit dislocations

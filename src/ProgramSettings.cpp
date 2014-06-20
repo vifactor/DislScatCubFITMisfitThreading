@@ -282,8 +282,12 @@ void ProgramSettings::read(const filesystem::path& cfgdir)
 		datacfg.readFile(filename.c_str());
 		datacfg.setAutoConvert(true);
 		const libconfig::Setting& dataroot = datacfg.getRoot();
-		m_dataConfig.set(dataroot["Data"], m_cpMap);
-		std::cout << m_dataConfig << std::endl;
+		m_dataConfig.resize(dataroot["Data"].getLength());
+		for(size_t i = 0; i < m_dataConfig.size(); i++)
+		{
+		    m_dataConfig[i].set(dataroot["Data"][i], m_cpMap);
+		    std::cout << m_dataConfig[i] << std::endl;
+		}
 		
 		filename = m_fitfile;
 		fitcfg.readFile(filename.c_str());

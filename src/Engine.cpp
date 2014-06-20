@@ -147,20 +147,21 @@ void Engine::calcI(std::vector<double>& vals)
 	}
 }
 
-boost::filesystem::path Engine::getFilename() const
+boost::filesystem::path
+Engine::getOutFilename(const boost::filesystem::path& infile) const
 {
-	boost::filesystem::path filename;
-
-	filename = m_programSettings->getDataConfig().file.filename();
-	filename.replace_extension("ft");
-	return filename;
+    boost::filesystem::path outfile;
+    
+    outfile = infile.filename();
+	outfile.replace_extension("ft");
+	return m_WorkDir / outfile;
 }
 
 void Engine::saveResult() const
 {
     boost::filesystem::path filename;
     
-    filename = m_WorkDir / getFilename();
+    filename = getOutFilename(m_programSettings->getDataConfig(0).file);
 	std::ofstream fout(filename.c_str());
 	if(!fout)
 	{
@@ -273,7 +274,7 @@ void Engine::readData()
 	DataReader dr;
 	boost::filesystem::path datapath;
 	
-	datapath = m_WorkDir / m_programSettings->getDataConfig().file;
+	datapath = m_WorkDir / m_programSettings->getDataConfig(0).file;
 	dr.readFile(datapath.c_str());
 
 	if(!dr.good())
@@ -289,7 +290,7 @@ void Engine::readData()
 	else
 	{
 		throw Engine::Exception("Column \"[intensity]\" has not been found in " +
-				m_programSettings->getDataConfig().file.native());
+				m_programSettings->getDataConfig(0).file.native());
 	}
 
 	if (dr.columnExist("[qx]"))
@@ -300,7 +301,7 @@ void Engine::readData()
 	else
 	{
 		throw Engine::Exception("Column \"[qx]\" has not been found in "+
-				m_programSettings->getDataConfig().file.native());
+				m_programSettings->getDataConfig(0).file.native());
 	}
 
 	if (dr.columnExist("[qz]"))
@@ -311,7 +312,7 @@ void Engine::readData()
 	else
 	{
 		throw Engine::Exception("Column \"[qz]\" has not been found in "+
-				m_programSettings->getDataConfig().file.native());
+				m_programSettings->getDataConfig(0).file.native());
 	}
 
 	/*allocate arguments and residuals*/
@@ -346,7 +347,7 @@ void Engine::setupCalculator()
 	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
 	/*transform hexagonal miller indices to vector*/
-	Q_vec = transformator.toVector3d(m_programSettings->getDataConfig().Q);
+	Q_vec = transformator.toVector3d(m_programSettings->getDataConfig(0).Q);
 	/*get Q in coplanar frame*/
 	Q = toCoplanarFrame(Q_vec, n_vec);
 	/* sign of the first index of Q_vec determines the difference between reflections
@@ -393,8 +394,8 @@ void Engine::setupCalculator()
 				/*FIXME : make sampling a part of program settings
 				 m_programSettings->getCalculatorSettings().sampling*/));
 		m_calculators.back()->setResolution(
-				m_programSettings->getDataConfig().resolX,
-				m_programSettings->getDataConfig().resolZ);
+				m_programSettings->getDataConfig(0).resolX,
+				m_programSettings->getDataConfig(0).resolZ);
 
 		m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculators, m_sample);
 	} catch (std::exception& ex)
