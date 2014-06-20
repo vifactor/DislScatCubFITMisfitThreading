@@ -160,7 +160,7 @@ boost::filesystem::path Engine::getFilename() const
 {
 	boost::filesystem::path filename;
 
-	filename = m_programSettings->getDataConfig().file;
+	filename = m_programSettings->getDataConfig().file.filename();
 	filename.replace_extension("ft");
 	return filename;
 }
