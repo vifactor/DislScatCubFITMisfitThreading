@@ -12,6 +12,7 @@
 #include "PortFitter.h"
 #include "ProgramSettings.h"
 #include "DataReader.h"
+#include "StringTools.h"
 
 #include <fstream>
 

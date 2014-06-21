@@ -8,11 +8,13 @@
 #ifndef DATAREADER_H_
 #define DATAREADER_H_
 
-#include <StringTools.h>
-
 #include <fstream>
 #include <map>
 #include <algorithm>
+
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 
 class DataReader
 {
@@ -20,37 +22,23 @@ public:
 	typedef std::string ColumnName;
 	typedef std::vector<double> ColumnType;
 	typedef std::map<ColumnName, double> RowType;
-	typedef std::pointer_to_unary_function<double, double> TransformType;
-	class TCondition: public std::unary_function<const RowType&, bool>
-	{
-	public:
-		TCondition() {}
-		virtual ~TCondition() {}
-		virtual bool operator()(const RowType& arg) const = 0;
-	};
+	typedef boost::tokenizer<boost::char_separator<char> > Tokenizer;
 public:
-	DataReader();
+	DataReader(const char * sep = " ", char com = '#');
 	virtual ~DataReader();
-	void readFile(std::string filename);
-	std::string getFilename() const {return filename;}
-
-	bool good() const {return status;}
-	bool columnExist(const ColumnName& name) const;
-	void getColumn(DataReader::ColumnType& col, const ColumnName& name) const;
-	void filter(const TCondition * apply = NULL);
+    void parse(const std::string& filename);
+	bool columnExists(const ColumnName& name) const;
+	const DataReader::ColumnType& columnGet(const ColumnName& name) const;
 private:
-	std::string filename;
+    std::map<ColumnName, ColumnType> m_data;
+    std::vector<ColumnName> m_columnNames;
+    ColumnType m_emptyColumn;
+    boost::char_separator<char> * m_cs;
+    char m_com;
 
-	std::map<ColumnName, ColumnType> data;
-	std::map<ColumnName, ColumnType> dataf;
-	std::vector<ColumnName> columnNames;
-	RowType row;
-	size_t nbRows;
-
-	bool isComment(const std::string& str);
-	void readHeader(const std::string& str);
-
-	mutable bool status;
+    bool isComment(const std::string& str) const;
+    void assignHeader(std::ifstream & fin);
+    void init();
 };
 
 #endif /* DATAREADER_H_ */

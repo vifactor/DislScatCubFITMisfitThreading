@@ -2,132 +2,122 @@
  * DataReader.cpp
  *
  *  Created on: 5 mar. 2012
- *      Author: kopp
+ *  Modified on: 21 june 2014
+ *      Author: Viktor Kopp
  */
 
 #include "DataReader.h"
 
-DataReader::DataReader()
+DataReader::DataReader(const char * sep, char com)
 {
-	nbRows = 0;
-	status = true;
+	m_cs = new boost::char_separator<char>(sep);
+	m_com = com;
 }
 
 DataReader::~DataReader()
 {
+    if(m_cs) delete m_cs;
 }
 
-void DataReader::readFile(std::string filename)
+void DataReader::init()
 {
-	this->filename=filename;
+    m_data.clear();
+    m_columnNames.clear();
+}
 
-	std::ifstream fin(filename.c_str());
-	if (!fin)
-	{
-		status = false;
-		return;
-	}
-
+void DataReader::parse(const std::string& filename)
+{
+    std::ifstream fin;
 	std::string line;
-	std::istringstream is;
-	size_t ln;
 	std::vector<std::string> values;
-	double value;
-
-	//here we read a header line
-	getline(fin, line);
-	readHeader(line);
-
-	ln = 1;
-	while (!fin.eof())
+    
+    /*clean containers*/
+    init();
+    
+    /*throw exception if opening/reading/closing file failed*/
+    fin.open(filename.c_str());
+    if(!fin.is_open()) throw std::ifstream::failure(filename + " does not exists.");
+    
+    assignHeader(fin);
+	while (getline(fin, line))
 	{
-		getline(fin, line);
-		++ln;
-		//skip the comment
-		if (isComment(line))
-			continue;
-
 		//split line into columns
-		values = split(line, " \t\n");
+		Tokenizer tok(line, *m_cs);
+		values.assign(tok.begin(),tok.end());
 		//check if nb of columns corresponds to number of headers
-		if(values.size() != columnNames.size())
+		if(values.size() == m_columnNames.size())
 		{
-			continue;
-		}
-
-		for(size_t icol = 0; icol < columnNames.size(); icol++)
-		{
-			is.str(values[icol]);
-			is >> value;
-			is.clear();
-
-			data[columnNames[icol]].push_back(value);
-			dataf[columnNames[icol]].push_back(value);
-
-		}
-		++nbRows;
-
+		    //distribute everything by columns
+            for(size_t i = 0; i < values.size(); ++i)
+            {
+                m_data[m_columnNames[i]].push_back(
+                        boost::lexical_cast<double>(values[i]));
+            }
+        }
 	}
 	fin.close();
 }
 
-bool DataReader::isComment(const std::string& str)
+bool DataReader::isComment(const std::string& str) const
 {
 	//empty string
 	if(str.empty()) return true;
 	//comment
-	if(str[0]=='#') return true;
+	if(str[0] == m_com) return true;
 	return false;
 }
 
-void DataReader::readHeader(const std::string& str)
+void DataReader::assignHeader(std::ifstream & fin)
 {
-	//no header line of type: % colName1 colName2...
-	if(str[0] != '#')
-	{
-		status = false;
-		return;
-	}
-
-	//split header line into column names with delimiters "% \t\n"
-	columnNames = split(str, "# \t\n\r");
-
-	if(columnNames.empty())
-	{
-		status = false;
-		return;
-	}
+        /*returns a commented string preceeding uncommented ones*/
+    std::string header, line;
+    int pos;
+    
+    /*memorize initial position*/
+    pos = fin.tellg();
+    while(getline(fin,line))
+    {
+        /*remove spaces from front and back of the string*/
+        boost::algorithm::trim(line);
+        if (isComment(line))
+        {
+            header = line.substr(1);
+            /*memorize initial position*/
+            pos = fin.tellg();
+        }
+        else
+        {
+            fin.seekg(pos);
+            break;
+        }
+    }
+    
+    Tokenizer tok(header, *m_cs);
+    //split header line into column names
+    m_columnNames.assign(tok.begin(), tok.end());
 }
 
-void DataReader::getColumn(ColumnType& col, const ColumnName& name) const
+const DataReader::ColumnType& DataReader::columnGet(const ColumnName& name) const
 {
 	std::map<ColumnName, ColumnType>::const_iterator it_map;
 
-	col.clear();
-
-	it_map = dataf.find(name);
-	if(it_map != dataf.end())
+	it_map = m_data.find(name);
+	if(it_map != m_data.end())
 	{
-		for(size_t i = 0; i < it_map->second.size(); ++i)
-			col.push_back(it_map->second.at(i));
+        return it_map->second;
 	}
 	else
-	{
-		status = false;
-	}
+	    //empty column
+	    return m_emptyColumn;
 }
 
-bool DataReader::columnExist(const ColumnName& name) const
+bool DataReader::columnExists(const ColumnName& name) const
 {
 	std::map<ColumnName, ColumnType>::const_iterator it_map;
 
-	it_map = dataf.find(name);
-	if(it_map != dataf.end())
-	{
+	it_map = m_data.find(name);
+	if(it_map != m_data.end())
 		return true;
-	}
 	else
-	{
 		return false;
-	}
 }

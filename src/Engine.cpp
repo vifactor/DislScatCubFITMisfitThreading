@@ -274,21 +274,15 @@ void Engine::setupComponents()
 
 void Engine::readData()
 {
-	DataReader dr;
+	DataReader dr("\t ");
 	boost::filesystem::path datapath;
 	
 	datapath = m_WorkDir / m_programSettings->getDataConfig(0).file;
-	dr.readFile(datapath.c_str());
+	dr.parse(datapath.native());
 
-	if(!dr.good())
+	if(dr.columnExists("[intensity]"))
 	{
-		throw Engine::Exception("File " + datapath.native() +
-				" has not been read or has no header");
-	}
-
-	if(dr.columnExist("[intensity]"))
-	{
-		dr.getColumn(m_exp_intens_vals, "[intensity]");
+		m_exp_intens_vals = dr.columnGet("[intensity]");
 	}
 	else
 	{
@@ -296,10 +290,10 @@ void Engine::readData()
 				m_programSettings->getDataConfig(0).file.native());
 	}
 
-	if (dr.columnExist("[qx]"))
+	if (dr.columnExists("[qx]"))
 	{
 		//get points without any transformation
-		dr.getColumn(m_qx_vals, "[qx]");
+		m_qx_vals = dr.columnGet("[qx]");
 	}
 	else
 	{
@@ -307,10 +301,10 @@ void Engine::readData()
 				m_programSettings->getDataConfig(0).file.native());
 	}
 
-	if (dr.columnExist("[qz]"))
+	if (dr.columnExists("[qz]"))
 	{
 		//get points without any transformation
-		dr.getColumn(m_qz_vals, "[qz]");
+		m_qz_vals = dr.columnGet("[qz]");
 	}
 	else
 	{
