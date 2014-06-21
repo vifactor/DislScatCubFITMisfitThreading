@@ -1,11 +1,12 @@
 /*
  * FitANACalculatorCoplanarTriple.cpp
  *
- *  Created on: 25 лип. 2013
+ *  Created on: 25 july 2013
  *      Author: kopp
  */
 
 #include "FitANACalculatorCoplanarTriple.h"
+using namespace boost;
 
 FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(
                     const std::vector<ANACalculatorCoplanarTriple *>& calculators,
@@ -15,7 +16,19 @@ FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(
 	
 	m_calculators = calculators;
 	m_backgrounds.resize(m_calculators.size());
-	m_scales.resize(m_calculators.size());
+    m_scales.resize(m_calculators.size());
+    initParameterNames();
+}
+
+void FitANACalculatorCoplanarTriple::initParameterNames()
+{
+    m_scale_names.resize(m_calculators.size());
+    m_background_names.resize(m_calculators.size());
+    for(size_t id = 0; id < m_calculators.size(); ++id)
+    {
+        m_scale_names[id] = "Data.[" + lexical_cast<std::string>(id) + "].I0";
+        m_background_names[id] = "Data.[" + lexical_cast<std::string>(id) + "].Ibg";
+    }
 }
 
 void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParameterMap& params)
@@ -23,11 +36,6 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	double rho_mf;
 	double rho_th_edge, rho_th_screw, rho_th_mixed;
 	double rc_th_edge, rc_th_screw, rc_th_mixed;
-	int id = 0;//FIXME
-
-	/*reinitialization of correlation radii of threading dislocations*/
-	m_scales[id] = params.find("Data.[0].I0")->second;
-	m_backgrounds[id] = params.find("Data.[0].Ibg")->second;
 
 	/*
 	 * reinitialization of densities of misfit dislocations
@@ -52,9 +60,6 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	rc_th_screw = params.find("Sample.dislocations.threading.screw.rc")->second;
 	rc_th_mixed = params.find("Sample.dislocations.threading.mixed.rc")->second;
 
-	std::cout << "scale:\t" << m_scales[id] << std::endl;
-	std::cout << "rho_mf:\t" << rho_mf << std::endl;
-
 	/*std::cout << "rho_th_edge:\t" << rho_th_edge << std::endl;
 	std::cout << "rho_th_screw:\t" << rho_th_screw << std::endl;
 	std::cout << "rho_th_mixed:\t" << rho_th_mixed << std::endl;
@@ -66,8 +71,18 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	m_sample->resetThreadingLayer(0, rho_th_edge, rc_th_edge);
 	m_sample->resetThreadingLayer(1, rho_th_screw, rc_th_screw);
 	m_sample->resetThreadingLayer(2, rho_th_mixed, rc_th_mixed);
-
-	m_calculators[0]->setSample(m_sample);
+    
+    for(size_t id = 0; id < m_calculators.size(); ++id)
+    {
+        /*reinitialization scale and background coefficients*/
+        m_scales[id] = params.find(m_scale_names[id])->second;
+        m_backgrounds[id] = params.find(m_background_names[id])->second;
+        
+        std::cout << m_scale_names[id] << ":\t" << m_scales[id] << std::endl;
+        
+        /*update each calculator*/
+        m_calculators[id]->setSample(m_sample);
+	}
 }
 
 double FitANACalculatorCoplanarTriple::eval(const NonlinearFit::CalculatorArgument * arg)

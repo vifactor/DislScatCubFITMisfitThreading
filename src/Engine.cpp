@@ -271,11 +271,10 @@ void Engine::updateConfigFile(const boost::filesystem::path & cfgfile) const
 void Engine::setupComponents()
 {
     for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
-    {
         setupCalculator(id);
-    }
     
-	readData(0);
+    for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
+	    readData(id);
     m_ini_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
     m_fin_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
 
