@@ -264,7 +264,10 @@ void Engine::updateConfigFile(const boost::filesystem::path & cfgfile) const
 
 void Engine::setupComponents()
 {
-	setupCalculator();
+    for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
+    {
+        setupCalculator(id);
+    }
 	readData();
 	setupFitter();
 }
@@ -333,7 +336,7 @@ void Engine::readData()
 	std::cout << "Nb data residuals:\t" << m_DataPoints.size() << std::endl;
 }
 
-void Engine::setupCalculator()
+void Engine::setupCalculator(size_t id)
 {
     Vector3d Q_vec, Q;
 	Vector3d b_vec, l_vec, n_vec, b;
@@ -347,7 +350,7 @@ void Engine::setupCalculator()
 	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
 	/*transform hexagonal miller indices to vector*/
-	Q_vec = transformator.toVector3d(m_programSettings->getDataConfig(0).Q);
+	Q_vec = transformator.toVector3d(m_programSettings->getDataConfig(id).Q);
 	/*get Q in coplanar frame*/
 	Q = toCoplanarFrame(Q_vec, n_vec);
 	/* sign of the first index of Q_vec determines the difference between reflections
@@ -394,8 +397,8 @@ void Engine::setupCalculator()
 				/*FIXME : make sampling a part of program settings
 				 m_programSettings->getCalculatorSettings().sampling*/));
 		m_calculators.back()->setResolution(
-				m_programSettings->getDataConfig(0).resolX,
-				m_programSettings->getDataConfig(0).resolZ);
+				m_programSettings->getDataConfig(id).resolX,
+				m_programSettings->getDataConfig(id).resolZ);
 
 		m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculators, m_sample);
 	} catch (std::exception& ex)
