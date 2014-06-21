@@ -36,7 +36,8 @@ private:
 	void setupComponents();
 	void setupCalculator(size_t i);
 	void setupFitter();
-	void readData();
+
+	void readData(size_t i);
 
 	void doWork();
 	void calcI(std::vector<double>& pts);

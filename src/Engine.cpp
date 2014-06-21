@@ -274,66 +274,52 @@ void Engine::setupComponents()
     {
         setupCalculator(id);
     }
-	readData();
+    
+	readData(0);
+    m_ini_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
+    m_fin_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
+
 	setupFitter();
 }
 
-void Engine::readData()
+void Engine::readData(size_t id)
 {
-	DataReader dr("\t ");
-	filesystem::path datapath;
-	
-	datapath = m_WorkDir / m_programSettings->getDataConfig(0).file;
-	dr.parse(datapath.native());
+    DataReader dr("\t ");
+    filesystem::path datapath;
 
-	if(dr.columnExists("[intensity]"))
-	{
-		m_exp_intens_vals = dr.columnGet("[intensity]");
-	}
-	else
-	{
-		throw Engine::Exception("Column \"[intensity]\" has not been found in " +
-				m_programSettings->getDataConfig(0).file.native());
-	}
-
-	if (dr.columnExists("[qx]"))
-	{
-		//get points without any transformation
-		m_qx_vals = dr.columnGet("[qx]");
-	}
-	else
-	{
-		throw Engine::Exception("Column \"[qx]\" has not been found in "+
-				m_programSettings->getDataConfig(0).file.native());
-	}
-
-	if (dr.columnExists("[qz]"))
-	{
-		//get points without any transformation
-		m_qz_vals = dr.columnGet("[qz]");
-	}
-	else
-	{
-		throw Engine::Exception("Column \"[qz]\" has not been found in "+
-				m_programSettings->getDataConfig(0).file.native());
-	}
-
-	/*allocate arguments and residuals*/
-	for(size_t i = 0; i < m_exp_intens_vals.size(); ++i)
-	{
-		m_DataPoints.push_back(
-				NonlinearFit::DataPoint(
-				        new ANACalculatorCoplanarTripleArgument(
-				            m_qx_vals[i], m_qz_vals[i],
-				            0 //FIXME
-				            ),
-						m_exp_intens_vals[i]));
-	}
-
-	m_ini_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
-	m_fin_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
-
-	std::cout << "Nb data residuals:\t" << m_DataPoints.size() << std::endl;
+    datapath = m_WorkDir / m_programSettings->getDataConfig(id).file;
+    dr.parse(datapath.native());
+    
+    if(!dr.columnExists("[intensity]"))
+        throw Engine::Exception("Column \"[intensity]\" has not been found in " +
+                            m_programSettings->getDataConfig(id).file.native());
+    else if(!dr.columnExists("[qx]"))
+        throw Engine::Exception("Column \"[qx]\" has not been found in "+
+                            m_programSettings->getDataConfig(id).file.native());
+    else if(!dr.columnExists("[qz]"))
+        throw Engine::Exception("Column \"[qz]\" has not been found in "+
+                            m_programSettings->getDataConfig(id).file.native());
+    else
+    {
+        const DataReader::ColumnType& intensity = dr.columnGet("[intensity]");
+        const DataReader::ColumnType& qx= dr.columnGet("[qx]");
+        const DataReader::ColumnType& qz = dr.columnGet("[qz]");
+        m_exp_intens_vals.insert(m_exp_intens_vals.end(),
+                                intensity.begin(),
+                                intensity.end());
+        m_qx_vals.insert(m_qx_vals.end(), qx.begin(), qx.end());
+        m_qz_vals.insert(m_qz_vals.end(), qz.begin(), qz.end());
+        
+        /*allocate arguments and residuals*/
+        for(size_t i = 0; i < intensity.size(); ++i)
+        {
+            m_DataPoints.push_back(
+                NonlinearFit::DataPoint(
+                        new ANACalculatorCoplanarTripleArgument(qx[i], qz[i], id),
+                        intensity[i]));
+        }
+        std::cout << "Nb data residuals:\t" << intensity.size() << std::endl;
+    }
 }
 
 void Engine::setupCalculator(size_t id)
