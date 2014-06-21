@@ -8,6 +8,7 @@
 
 using namespace NonlinearFit;
 using namespace Geometry;
+using namespace boost;
 
 /*----------- Handy functions --------------*/
 Vector3d toMisfitFrame(const Vector3d& burgers,
@@ -84,7 +85,7 @@ Engine::~Engine()
     init();
 }
 
-void Engine::exec(const boost::filesystem::path & workDir)
+void Engine::exec(const filesystem::path & workDir)
 {
    
     m_WorkDir = workDir;
@@ -147,10 +148,10 @@ void Engine::calcI(std::vector<double>& vals)
 	}
 }
 
-boost::filesystem::path
-Engine::getOutFilename(const boost::filesystem::path& infile) const
+filesystem::path
+Engine::getOutFilename(const filesystem::path& infile) const
 {
-    boost::filesystem::path outfile;
+    filesystem::path outfile;
     
     outfile = infile.filename();
 	outfile.replace_extension("ft");
@@ -159,7 +160,7 @@ Engine::getOutFilename(const boost::filesystem::path& infile) const
 
 void Engine::saveResult() const
 {
-    boost::filesystem::path filename;
+    filesystem::path filename;
     
     filename = getOutFilename(m_programSettings->getDataConfig(0).file);
 	std::ofstream fout(filename.c_str());
@@ -249,16 +250,21 @@ void Engine::updateConfigFile(const boost::filesystem::path & cfgfile) const
 		throw Engine::Exception("I/O error while reading file:\t" + oldcfgfile.native());
 	} catch (const libconfig::ParseException &pex)
 	{
-		throw Engine::Exception("Parse error at " +
-									toString(pex.getFile()) + ":" +
-									toString(pex.getLine()) + " - " +
-									toString(pex.getError()));
+		throw Engine::Exception("Parse error at "
+									+ lexical_cast<std::string>(pex.getFile()) 
+									+ ":"
+									+ lexical_cast<std::string>(pex.getLine()) 
+									+ " - "
+									+ lexical_cast<std::string>(pex.getError()));
 	}catch(const libconfig::SettingNotFoundException &nfex)
 	{
-		throw Engine::Exception(toString(nfex.getPath()));
+		throw Engine::Exception(nfex.getPath());
 	}catch(libconfig::SettingTypeException& tex)
 	{
-		throw Engine::Exception(toString(tex.getPath()) + "(" + toString(tex.what()) + ")");
+		throw Engine::Exception(lexical_cast<std::string>(tex.getPath())
+		                             + "(" 
+		                             + lexical_cast<std::string>(tex.what())
+		                             + ")");
 	}
 }
 
@@ -275,7 +281,7 @@ void Engine::setupComponents()
 void Engine::readData()
 {
 	DataReader dr("\t ");
-	boost::filesystem::path datapath;
+	filesystem::path datapath;
 	
 	datapath = m_WorkDir / m_programSettings->getDataConfig(0).file;
 	dr.parse(datapath.native());
@@ -398,7 +404,8 @@ void Engine::setupCalculator(size_t id)
 	} catch (std::exception& ex)
 	{
 		throw Engine::Exception(
-				"Calculator allocation pb (" + toString(ex.what()) + ")");
+				"Calculator allocation pb (" + 
+				lexical_cast<std::string>(ex.what()) + ")");
 	}
 }
 
