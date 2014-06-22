@@ -48,7 +48,7 @@ private:
 	void updateConfigFile(const boost::filesystem::path & filename) const;
 	void saveResume() const;
 	void saveResult() const;
-	void saveFitIntensity() const;
+	void saveFitData(size_t id) const;
 	void printFitterInfo(NonlinearFit::NonlinearFitter * fitter);
 
 	ANASampleCub  * m_sample;
@@ -62,6 +62,7 @@ private:
 
 	std::vector<double> m_qx_vals, m_qz_vals;
 	std::vector<double> m_exp_intens_vals, m_ini_intens_vals, m_fin_intens_vals;
+	std::vector<size_t> m_vals_sizes;
 	NonlinearFit::DataPointList m_DataPoints;
 	NonlinearFit::ResidualList m_Residuals;
 	

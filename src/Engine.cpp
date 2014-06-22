@@ -75,6 +75,7 @@ Engine::Engine()
 	m_programSettings = NULL;
 	m_fit_calculator = NULL;
 	m_sample = NULL;
+	
 }
 
 Engine::~Engine()
@@ -125,27 +126,24 @@ void Engine::init()
 		delete m_DataPoints[i].m_Argument;
 	}
 	m_DataPoints.clear();
+	
+	m_vals_sizes.clear();
+	m_vals_sizes.push_back(0);
 }
 
 void Engine::doWork()
 {
 	calcI(m_ini_intens_vals);
 	fitI();
-	printFitterInfo(m_fitter);
 	calcI(m_fin_intens_vals);
 }
 
 void Engine::calcI(std::vector<double>& vals)
 {
-	double I;
-
 	m_fit_calculator->reinit(m_programSettings->getCPMap());
 
 	for(size_t ipt = 0; ipt < m_DataPoints.size(); ipt++)
-	{
-		I = m_fit_calculator->eval(m_DataPoints[ipt].m_Argument);
-		vals[ipt] = I;
-	}
+		vals[ipt] = m_fit_calculator->eval(m_DataPoints[ipt].m_Argument);
 }
 
 filesystem::path
@@ -160,29 +158,30 @@ Engine::getOutFilename(const filesystem::path& infile) const
 
 void Engine::saveResult() const
 {
+    for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
+        saveFitData(id);
+    saveResume();
+}
+
+void Engine::saveFitData(size_t id) const
+{
     filesystem::path filename;
     
-    filename = getOutFilename(m_programSettings->getDataConfig(0).file);
-	std::ofstream fout(filename.c_str());
-	if(!fout)
+    filename = getOutFilename(m_programSettings->getDataConfig(id).file);
+    
+    std::ofstream fout(filename.c_str());
+	fout << "#qx\tqz\tIexp\tIini\tIfin" << std::endl;
+	for(size_t ipt = m_vals_sizes[id]; ipt < m_vals_sizes[id + 1]; ipt++)
 	{
-		throw Engine::Exception("Unable to open the output file:\t" +
-		                    filename.native());
-	}
-
-	fout<<"#qx\tqz\tIexp\tIini\tIfin"<<std::endl;
-	for(size_t ipt = 0; ipt < m_DataPoints.size(); ipt++)
-	{
-		fout<<m_qx_vals[ipt]<<"\t"
-			<<m_qz_vals[ipt]<<"\t"
-			<<m_exp_intens_vals[ipt]<<"\t"
-			<<m_ini_intens_vals[ipt]<<"\t"
-			<<m_fin_intens_vals[ipt]<<"\t"
-				<<std::endl;
+        fout << m_qx_vals[ipt] << "\t"
+            << m_qz_vals[ipt] << "\t"
+			<< m_exp_intens_vals[ipt] << "\t"
+			<< m_ini_intens_vals[ipt] << "\t"
+			<< m_fin_intens_vals[ipt] << std::endl;
 	}
 	fout.close();
-	saveResume();
 }
+
 
 void Engine::fitI()
 {
@@ -190,7 +189,8 @@ void Engine::fitI()
 	//with max "calculationSettings.modefitSettings.nbIterations" iterations
 	m_fitter->fit(NonlinearFitter::fitLIN,
 	    m_programSettings->getFitConfig().nbIterations);
-
+    printFitterInfo(m_fitter);
+	
 	//get new values (best fit values) of fit parameters
 	m_fParametersFinal = m_fitter->getFitParameters();
 	
@@ -317,6 +317,8 @@ void Engine::readData(size_t id)
                         new ANACalculatorCoplanarTripleArgument(qx[i], qz[i], id),
                         intensity[i]));
         }
+        
+        m_vals_sizes.push_back(m_vals_sizes.back() + intensity.size());
         std::cout << "Nb data residuals:\t" << intensity.size() << std::endl;
     }
 }
