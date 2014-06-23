@@ -28,6 +28,9 @@ public:
 	double T_threading(double r, double phi) const;
 	double T_misfit(double x, double y, double z1, double z2) const;
 	void wij(double z1, double& wxx, double& wxz, double& wzz) const;
+	
+	size_t getNbMisfitInterfaces() const {return m_interfaces.size();}
+	size_t getNbThreadingLayers() const {return m_layers.size();}
 	double m_thickness;
 	double m_size;
 protected:

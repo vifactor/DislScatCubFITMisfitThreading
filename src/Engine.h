@@ -35,6 +35,7 @@ private:
 	void init();
 	void setupComponents();
 	void setupCalculator(size_t i);
+	void setupSample();
 	void setupFitter();
 
 	void readData(size_t i);

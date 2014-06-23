@@ -331,10 +331,7 @@ void Engine::setupCalculator(size_t id)
 	                                m_programSettings->getSampleConfig().a0);
 	double phi;
 	
-	l_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit[0].l);
-	b_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit[0].b);
 	n_vec = Vector3d(0, 0, 1);
-	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
 	/*transform hexagonal miller indices to vector*/
 	Q_vec = transformator.toVector3d(m_programSettings->getDataConfig(id).Q);
@@ -344,22 +341,30 @@ void Engine::setupCalculator(size_t id)
 	 * like [224] and [-2-24]
 	*/
 	Q[0] *= GSL_SIGN (Q_vec[0]);
-	
-	phi = toMisfitInPlaneAngle(Q_vec, b_vec, l_vec, n_vec);
                 
 	try
 	{
 		m_sample = new ANASampleCub(m_programSettings->getSampleConfig().thickness,
 				m_programSettings->getSampleConfig().width);
 
-		/*one misfit interfaces*/
-		m_sample->addMisfitInterface(
-					m_programSettings->getSampleConfig().misfit[0].rho * 1e-7,
-					b(0), b(1), b(2),
-					Q(0), Q(1), Q(2),
-					phi,
-					m_programSettings->getSampleConfig().nu,
-					m_programSettings->getSampleConfig().thickness);
+		/*misfit interfaces*/
+		const std::vector<ProgramSettings::SampleConfig::MisfitDislocationType>& 
+		    mf_dislocations = m_programSettings->getSampleConfig().misfit;
+		for(size_t i = 0; i < mf_dislocations.size(); ++i)
+		{
+		    l_vec = transformator.toVector3d(mf_dislocations[i].l);
+	        b_vec = transformator.toVector3d(mf_dislocations[i].b);
+	        
+	        b = toMisfitFrame(b_vec, l_vec, n_vec);
+	        phi = toMisfitInPlaneAngle(Q_vec, b_vec, l_vec, n_vec);
+            m_sample->addMisfitInterface(
+                mf_dislocations[i].rho * 1e-7,
+                b(0), b(1), b(2),
+                Q(0), Q(1), Q(2),
+                phi,
+                m_programSettings->getSampleConfig().nu,
+                m_programSettings->getSampleConfig().thickness);
+		}
 		/*add threading layers*/
 		m_sample->addThreadingLayer(
 					m_programSettings->getSampleConfig().threading_edge.rho * 1e-14,
