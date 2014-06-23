@@ -15,37 +15,49 @@ FitANACalculatorCoplanarTriple::FitANACalculatorCoplanarTriple(
 	m_sample = sample;
 	
 	m_calculators = calculators;
-	m_backgrounds.resize(m_calculators.size());
-    m_scales.resize(m_calculators.size());
+	m_scales.resize(m_calculators.size());
+    m_backgrounds.resize(m_calculators.size());
+    
     initParameterNames();
 }
 
 void FitANACalculatorCoplanarTriple::initParameterNames()
 {
+    /*Data fit parameter names*/
     m_scale_names.resize(m_calculators.size());
     m_background_names.resize(m_calculators.size());
     for(size_t id = 0; id < m_calculators.size(); ++id)
     {
-        m_scale_names[id] = "Data.[" + lexical_cast<std::string>(id) + "].I0";
-        m_background_names[id] = "Data.[" + lexical_cast<std::string>(id) + "].Ibg";
+        m_scale_names.at(id) = "Data.[" + lexical_cast<std::string>(id) + "].I0";
+        m_background_names.at(id) = "Data.[" + lexical_cast<std::string>(id) + "].Ibg";
+    }
+    /*misfit interfaces names*/
+    m_mf_density_names.resize(m_sample->getNbMisfitInterfaces());
+    for(size_t id = 0; id < m_calculators.size(); ++id)
+    {
+        m_mf_density_names.at(id) = "Sample.dislocations.misfit.[" 
+                            + lexical_cast<std::string>(id) 
+                            + "].rho";
     }
 }
 
 void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParameterMap& params)
 {
-	double rho_mf;
+    static double rho_mf;
 	double rho_th_edge, rho_th_screw, rho_th_mixed;
 	double rc_th_edge, rc_th_screw, rc_th_mixed;
 
 	/*
 	 * reinitialization of densities of misfit dislocations
-	 * initially threading dislocation density is given in [cm-1]
+	 * initially misfit dislocation density is given in [cm-1]
 	 * coefficient 1e-7 transforms it to [nm-1]
 	*/
-	rho_mf = params.find("Sample.dislocations.misfit.[0].rho")->second  * 1e-7;
-
-	m_sample->resetMisfitInterface(0, rho_mf);
-	std::cout << "rho_mf" << ":\t" << rho_mf << std::endl;
+	for(size_t id = 0; id < m_sample->getNbMisfitInterfaces(); ++id)
+	{
+	    rho_mf = params.find(m_mf_density_names[id])->second  * 1e-7;
+	    std::cout << m_mf_density_names[id] << ":\t" << rho_mf << std::endl;
+	    m_sample->resetMisfitInterface(id, rho_mf);
+	}
 
 	/*
 	 * reinitialization of densities of threading dislocations

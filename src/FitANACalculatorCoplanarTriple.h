@@ -40,7 +40,9 @@ protected:
     ANASampleCub * m_sample;
 	std::vector<ANACalculatorCoplanarTriple *> m_calculators;
 	std::vector<double> m_scales, m_backgrounds;
-	std::vector<std::string> m_scale_names, m_background_names;
+	std::vector<std::string> m_scale_names,
+	                         m_background_names,
+	                         m_mf_density_names;
 	
 	void initParameterNames();
 };
