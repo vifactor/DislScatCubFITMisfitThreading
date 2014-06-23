@@ -87,7 +87,7 @@ public:
 			double rc;
 		};
 
-		MisfitDislocationType misfit;
+        std::vector<MisfitDislocationType> misfit;
 		ThreadingDislocationType threading_edge;
 		ThreadingDislocationType threading_screw;
 		ThreadingDislocationType threading_mixed;

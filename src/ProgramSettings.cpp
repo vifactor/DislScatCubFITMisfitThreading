@@ -111,35 +111,39 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 	const libconfig::Setting &dislocations = sample["dislocations"];
 	if(dislocations.exists("misfit"))
 	{
-		misfit.rho = dislocations["misfit"]["rho"];
-        cmap[dislocations["misfit"]["rho"].getPath()] = misfit.rho;
-		/*burgers vector*/
-	    if(dislocations["misfit"]["b"].isArray() && 
-	       dislocations["misfit"]["b"].getLength() == MillerCubIndicesDimension)
+	    /*find how many misfit dislocation types are present*/
+	    int nb_mf_types = dislocations["misfit"].getLength();
+	    misfit.resize(nb_mf_types);
+	    for(int i = 0; i < nb_mf_types; ++i)
 	    {
-		    misfit.b.X = dislocations["misfit"]["b"][0];
-		    misfit.b.Y = dislocations["misfit"]["b"][1];
-		    misfit.b.Z = dislocations["misfit"]["b"][2];
-		}
-		else
-		    throw ProgramSettings::Exception(
-		                            dislocations["misfit"]["b"].getPath());
-		/*dislocation line*/
-	    if(dislocations["misfit"]["l"].isArray() && 
-	       dislocations["misfit"]["l"].getLength() 
+	        const libconfig::Setting & interface = 
+	                    dislocations["misfit"][i];
+
+            misfit[i].rho = interface["rho"];
+            cmap[interface["rho"].getPath()] = misfit[i].rho;
+		    /*burgers vector*/
+	        if(interface["b"].isArray() && interface["b"].getLength()
+	                                             == MillerCubIndicesDimension)
+	        {
+		        misfit[i].b.X = interface["b"][0];
+		        misfit[i].b.Y = interface["b"][1];
+		        misfit[i].b.Z = interface["b"][2];
+		    }
+		    else
+		        throw ProgramSettings::Exception(
+		                            interface["b"].getPath());
+		    /*dislocation line*/
+	        if(interface["l"].isArray() && interface["l"].getLength() 
 	                                            == MillerCubIndicesDimension)
-	    {
-		    misfit.l.X = dislocations["misfit"]["l"][0];
-		    misfit.l.Y = dislocations["misfit"]["l"][1];
-		    misfit.l.Z = dislocations["misfit"]["l"][2];
-	    }
-	    else
-		    throw ProgramSettings::Exception(
-		                            dislocations["misfit"]["l"].getPath());
-	}
-	else
-	{
-		misfit.rho = 0.0;
+            {
+		        misfit[i].l.X = interface["l"][0];
+		        misfit[i].l.Y = interface["l"][1];
+		        misfit[i].l.Z = interface["l"][2];
+	        }
+	        else
+		        throw ProgramSettings::Exception(
+		                            interface["l"].getPath());
+	   }
 	}
 
 	if(dislocations.exists("threading"))
@@ -151,8 +155,6 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 		    cmap[threading["edge"]["rho"].getPath()] = threading_edge.rho;
 		    threading_edge.rc = threading["edge"]["rc"];
 		    cmap[threading["edge"]["rc"].getPath()] = threading_edge.rc;
-		    threading_edge.b_edge = a0;
-		    threading_edge.b_screw = 0.0;
 	    }
 	    else
 	    {
@@ -161,6 +163,8 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 		    threading_edge.rc = 0.0;
 		    cmap[threading.getPath() + ".edge.rc"] = threading_edge.rc;
 	    }
+	    threading_edge.b_edge = a0;
+		threading_edge.b_screw = 0.0;
 
 	    if(threading.exists("screw"))
 	    {
@@ -168,16 +172,16 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 		    cmap[threading["screw"]["rho"].getPath()] = threading_screw.rho;
 		    threading_screw.rc = threading["screw"]["rc"];
 		    cmap[threading["screw"]["rc"].getPath()] = threading_screw.rc;
-		    threading_screw.b_edge = 0;
-		    threading_screw.b_screw = a0;
 	    }
 	    else
 	    {
 		    threading_screw.rho = 0.0;
             cmap[threading.getPath() + ".screw.rho"] = threading_screw.rho;
-		    threading_screw.rc = 0.0;
+		    threading_screw.rc = 1.0;
             cmap[threading.getPath() + ".screw.rc"] = threading_screw.rc;
 	    }
+	    threading_screw.b_edge = 0;
+        threading_screw.b_screw = a0;
 
 	    if(threading.exists("mixed"))
 	    {
@@ -185,16 +189,16 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 		    cmap[threading["mixed"]["rho"].getPath()] = threading_mixed.rho;
 		    threading_mixed.rc = threading["mixed"]["rc"];
 		    cmap[threading["mixed"]["rho"].getPath()] = threading_mixed.rc;
-		    threading_mixed.b_edge = a0;
-		    threading_mixed.b_screw = a0;
 	    }
 	    else
 	    {
 		    threading_mixed.rho = 0.0;
 		    cmap[threading.getPath() + ".mixed.rho"] = threading_mixed.rho;
-		    threading_mixed.rc = 0.0;
+		    threading_mixed.rc = 1.0;
 		    cmap[threading.getPath() + ".mixed.rc"] = threading_mixed.rc;
 	    }
+	    threading_mixed.b_edge = a0;
+		threading_mixed.b_screw = a0;
 	}
 }
 
@@ -209,10 +213,14 @@ operator<<(std::ostream& out, const ProgramSettings::SampleConfig &sample)
 			<< sample.width << std::endl;
 	out << "\tPoisson ratio:\t" << sample.nu << std::endl;
 
-	out << "\tMisfit dislocations:" << std::endl;
-	out << "\t\tBurgers vector:\t" << sample.misfit.b << std::endl;
-	out << "\t\tDislocation line:\t" << sample.misfit.l << std::endl;
-	out << "\t\tDensity :\t" << sample.misfit.rho << std::endl;
+    out << "\tMisfit dislocations:" << std::endl;
+    for(size_t i = 0; i < sample.misfit.size(); ++i)
+    {
+        out << "\t\t[" << i << "]---" << std::endl;
+        out << "\t\tBurgers vector:\t" << sample.misfit[i].b << std::endl;
+        out << "\t\tDislocation line:\t" << sample.misfit[i].l << std::endl;
+        out << "\t\tDensity :\t" << sample.misfit[i].rho << std::endl;
+    }
 
 	out << "\tThreading dislocations:" << std::endl;
 	out << "\t\tEdge" << std::endl;

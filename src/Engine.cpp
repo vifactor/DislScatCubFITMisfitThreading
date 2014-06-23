@@ -331,8 +331,8 @@ void Engine::setupCalculator(size_t id)
 	                                m_programSettings->getSampleConfig().a0);
 	double phi;
 	
-	l_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit.l);
-	b_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit.b);
+	l_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit[0].l);
+	b_vec = transformator.toVector3d(m_programSettings->getSampleConfig().misfit[0].b);
 	n_vec = Vector3d(0, 0, 1);
 	b = toMisfitFrame(b_vec, l_vec, n_vec);
 
@@ -354,7 +354,7 @@ void Engine::setupCalculator(size_t id)
 
 		/*one misfit interfaces*/
 		m_sample->addMisfitInterface(
-					m_programSettings->getSampleConfig().misfit.rho * 1e-7,
+					m_programSettings->getSampleConfig().misfit[0].rho * 1e-7,
 					b(0), b(1), b(2),
 					Q(0), Q(1), Q(2),
 					phi,

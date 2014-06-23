@@ -42,9 +42,10 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	 * initially threading dislocation density is given in [cm-1]
 	 * coefficient 1e-7 transforms it to [nm-1]
 	*/
-	rho_mf = params.find("Sample.dislocations.misfit.rho")->second  * 1e-7;
+	rho_mf = params.find("Sample.dislocations.misfit.[0].rho")->second  * 1e-7;
 
 	m_sample->resetMisfitInterface(0, rho_mf);
+	std::cout << "rho_mf" << ":\t" << rho_mf << std::endl;
 
 	/*
 	 * reinitialization of densities of threading dislocations
