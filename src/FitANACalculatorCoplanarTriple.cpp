@@ -33,11 +33,23 @@ void FitANACalculatorCoplanarTriple::initParameterNames()
     }
     /*misfit interfaces names*/
     m_mf_density_names.resize(m_sample->getNbMisfitInterfaces());
-    for(size_t id = 0; id < m_calculators.size(); ++id)
+    for(size_t id = 0; id < m_sample->getNbMisfitInterfaces(); ++id)
     {
         m_mf_density_names.at(id) = "Sample.dislocations.misfit.[" 
                             + lexical_cast<std::string>(id) 
                             + "].rho";
+    }
+    /*theading layers names*/
+    m_th_density_names.resize(m_sample->getNbThreadingLayers());
+    m_th_rc_names.resize(m_sample->getNbThreadingLayers());
+    for(size_t id = 0; id < m_sample->getNbThreadingLayers(); ++id)
+    {
+        m_th_density_names.at(id) = "Sample.dislocations.threading.[" 
+                            + lexical_cast<std::string>(id) 
+                            + "].rho";
+        m_th_rc_names.at(id) = "Sample.dislocations.threading.[" 
+                            + lexical_cast<std::string>(id) 
+                            + "].rc";
     }
 }
 
@@ -47,31 +59,31 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	static double rho_th, rc_th;
 
 	/*
-	 * reinitialization of densities of misfit dislocations
+	 * reinitialization of densities of misfit dislocations.
 	 * initially misfit dislocation density is given in [cm-1]
 	 * coefficient 1e-7 transforms it to [nm-1]
 	*/
 	for(size_t id = 0; id < m_sample->getNbMisfitInterfaces(); ++id)
 	{
 	    rho_mf = params.find(m_mf_density_names[id])->second  * 1e-7;
-	    std::cout << m_mf_density_names[id] << ":\t" << rho_mf << std::endl;
 	    m_sample->resetMisfitInterface(id, rho_mf);
 	}
 
 	/*
-	 * reinitialization of densities of threading dislocations
+	 * reinitialization of densities and correlation radii of threading dislocations.
 	 * initially threading dislocation density is given in [cm-2]
 	 * coefficient 1e-14 transforms it to [nm-2]
 	*/
-	rho_th = params.find("Sample.dislocations.threading.[0].rho")->second  * 1e-14;
-
-	/*reinitialization of correlation radii of threading dislocations*/
-	rc_th = params.find("Sample.dislocations.threading.[0].rc")->second;
-
-	/*std::cout << "rho_th:\t" << rho_th << std::endl;
-	std::cout << "rc_th:\t" << rc_th << std::endl;*/
-
-	m_sample->resetThreadingLayer(0, rho_th, rc_th);
+	for(size_t id = 0; id < m_sample->getNbThreadingLayers(); ++id)
+	{
+	    rho_th = params.find(m_th_density_names[id])->second * 1e-14;
+	    rc_th = params.find(m_th_rc_names[id])->second;
+	    m_sample->resetThreadingLayer(id, rho_th, rc_th);
+	    
+	    /*//DEBUG*/
+	    std::cout << m_th_density_names[id] << ":\t" << rho_th << std::endl;
+	    std::cout << m_th_rc_names[id]  << ":\t" << rc_th << std::endl;
+	}
     
     for(size_t id = 0; id < m_calculators.size(); ++id)
     {

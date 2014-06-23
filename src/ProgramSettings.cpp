@@ -179,8 +179,7 @@ std::ostream&
 operator<<(std::ostream& out, const ProgramSettings::SampleConfig &sample)
 {
     out << "--- Sample settings ---" << std::endl;
-	out << "\tLattice parameters: (a0)\t" << sample.a0 << ", "
-			<< std::endl;
+	out << "\tLattice parameters: (a0)\t" << sample.a0 << std::endl;
 	out << "\tSample dimensions (thickness width):\t" 
             << sample.thickness << "\t"
 			<< sample.width << std::endl;

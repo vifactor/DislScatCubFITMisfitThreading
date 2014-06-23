@@ -379,16 +379,19 @@ void Engine::setupCalculator(size_t id)
                 m_programSettings->getSampleConfig().nu,
                 m_programSettings->getSampleConfig().thickness);
 		}
-		/*add threading layers*/
-		b_vec = transformator.toVector3d(m_programSettings->getSampleConfig().threading[0].b);
-		b = toThreadingFrame(b_vec, n_vec);
-		m_sample->addThreadingLayer(
-					m_programSettings->getSampleConfig().threading[0].rho * 1e-14,
-					b(0), b(2),
-					m_programSettings->getSampleConfig().threading[0].rc, 
-					Q(0), Q(2),
-					m_programSettings->getSampleConfig().nu);
-
+		/*threading layers*/
+        const std::vector<ProgramSettings::SampleConfig::ThreadingDislocationType>& 
+            th_dislocations = m_programSettings->getSampleConfig().threading;
+        for(size_t i = 0; i < th_dislocations.size(); ++i)
+        {
+            b_vec = transformator.toVector3d(th_dislocations[id].b);
+            b = toThreadingFrame(b_vec, n_vec);
+            m_sample->addThreadingLayer(th_dislocations[id].rho * 1e-14,
+                b(0), b(2),
+                th_dislocations[id].rc, 
+                Q(0), Q(2),
+                m_programSettings->getSampleConfig().nu);
+        }
 
 		m_calculators.push_back(new ANACalculatorCoplanarTriple(m_sample, 150
 				/*FIXME : make sampling a part of program settings

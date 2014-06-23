@@ -42,7 +42,9 @@ protected:
 	std::vector<double> m_scales, m_backgrounds;
 	std::vector<std::string> m_scale_names,
 	                         m_background_names,
-	                         m_mf_density_names;
+	                         m_mf_density_names,
+	                         m_th_density_names,
+	                         m_th_rc_names;
 	
 	void initParameterNames();
 };
