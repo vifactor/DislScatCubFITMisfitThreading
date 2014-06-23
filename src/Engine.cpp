@@ -31,6 +31,20 @@ Vector3d toMisfitFrame(const Vector3d& burgers,
     return Vector3d(bx, by, bz);
 }
 
+Vector3d toThreadingFrame(const Vector3d& burgers,
+                     const Vector3d& normal)
+{
+    Vector3d norm_dir;
+    
+    norm_dir = normalize(normal);
+    
+    /*screw and edge components of the dislocation*/
+    double b_screw = inner_prod(burgers, norm_dir);
+    double b_edge = norm_2(burgers - b_screw * norm_dir);
+    
+    return Vector3d(b_edge, 0.0, b_screw);
+}
+
 Vector3d toCoplanarFrame(const Vector3d& Q, const Vector3d& normal)
 {
     Vector3d norm_dir;
@@ -366,24 +380,15 @@ void Engine::setupCalculator(size_t id)
                 m_programSettings->getSampleConfig().thickness);
 		}
 		/*add threading layers*/
+		b_vec = transformator.toVector3d(m_programSettings->getSampleConfig().threading[0].b);
+		b = toThreadingFrame(b_vec, n_vec);
 		m_sample->addThreadingLayer(
-					m_programSettings->getSampleConfig().threading_edge.rho * 1e-14,
-					m_programSettings->getSampleConfig().threading_edge.b_edge,
-					m_programSettings->getSampleConfig().threading_edge.b_screw,
-					m_programSettings->getSampleConfig().threading_edge.rc, Q(0), Q(2),
+					m_programSettings->getSampleConfig().threading[0].rho * 1e-14,
+					b(0), b(2),
+					m_programSettings->getSampleConfig().threading[0].rc, 
+					Q(0), Q(2),
 					m_programSettings->getSampleConfig().nu);
-		m_sample->addThreadingLayer(
-					m_programSettings->getSampleConfig().threading_screw.rho * 1e-14,
-					m_programSettings->getSampleConfig().threading_screw.b_edge,
-					m_programSettings->getSampleConfig().threading_screw.b_screw,
-					m_programSettings->getSampleConfig().threading_screw.rc, Q(0), Q(2),
-					m_programSettings->getSampleConfig().nu);
-		m_sample->addThreadingLayer(
-					m_programSettings->getSampleConfig().threading_mixed.rho * 1e-14,
-					m_programSettings->getSampleConfig().threading_mixed.b_edge,
-					m_programSettings->getSampleConfig().threading_mixed.b_screw,
-					m_programSettings->getSampleConfig().threading_mixed.rc, Q(0), Q(2),
-					m_programSettings->getSampleConfig().nu);
+
 
 		m_calculators.push_back(new ANACalculatorCoplanarTriple(m_sample, 150
 				/*FIXME : make sampling a part of program settings

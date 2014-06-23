@@ -80,7 +80,7 @@ public:
 		};
 		struct ThreadingDislocationType
 		{
-			double b_edge, b_screw;
+			MillerDirectCubIndices b;
 			/*dislocation density*/
 			double rho;
 			/*correlation radius*/
@@ -88,9 +88,7 @@ public:
 		};
 
         std::vector<MisfitDislocationType> misfit;
-		ThreadingDislocationType threading_edge;
-		ThreadingDislocationType threading_screw;
-		ThreadingDislocationType threading_mixed;
+		std::vector<ThreadingDislocationType> threading;
         friend std::ostream& operator<< (std::ostream &out,
                                         const SampleConfig &data);
         void set(const libconfig::Setting&, 

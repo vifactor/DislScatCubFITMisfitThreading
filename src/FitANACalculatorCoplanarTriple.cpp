@@ -44,8 +44,7 @@ void FitANACalculatorCoplanarTriple::initParameterNames()
 void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParameterMap& params)
 {
     static double rho_mf;
-	double rho_th_edge, rho_th_screw, rho_th_mixed;
-	double rc_th_edge, rc_th_screw, rc_th_mixed;
+	static double rho_th, rc_th;
 
 	/*
 	 * reinitialization of densities of misfit dislocations
@@ -64,34 +63,21 @@ void FitANACalculatorCoplanarTriple::reinit(const NonlinearFit::CalculatorParame
 	 * initially threading dislocation density is given in [cm-2]
 	 * coefficient 1e-14 transforms it to [nm-2]
 	*/
-	rho_th_edge = params.find("Sample.dislocations.threading.edge.rho")->second  * 1e-14;
-	rho_th_screw = params.find("Sample.dislocations.threading.screw.rho")->second * 1e-14;
-	rho_th_mixed = params.find("Sample.dislocations.threading.mixed.rho")->second * 1e-14;
+	rho_th = params.find("Sample.dislocations.threading.[0].rho")->second  * 1e-14;
 
 	/*reinitialization of correlation radii of threading dislocations*/
-	rc_th_edge = params.find("Sample.dislocations.threading.edge.rc")->second;
-	rc_th_screw = params.find("Sample.dislocations.threading.screw.rc")->second;
-	rc_th_mixed = params.find("Sample.dislocations.threading.mixed.rc")->second;
+	rc_th = params.find("Sample.dislocations.threading.[0].rc")->second;
 
-	/*std::cout << "rho_th_edge:\t" << rho_th_edge << std::endl;
-	std::cout << "rho_th_screw:\t" << rho_th_screw << std::endl;
-	std::cout << "rho_th_mixed:\t" << rho_th_mixed << std::endl;
+	/*std::cout << "rho_th:\t" << rho_th << std::endl;
+	std::cout << "rc_th:\t" << rc_th << std::endl;*/
 
-	std::cout << "rc_th_edge:\t" << rc_th_edge << std::endl;
-	std::cout << "rc_th_screw:\t" << rc_th_screw << std::endl;
-	std::cout << "rc_th_mixed:\t" << rc_th_mixed << std::endl;*/
-
-	m_sample->resetThreadingLayer(0, rho_th_edge, rc_th_edge);
-	m_sample->resetThreadingLayer(1, rho_th_screw, rc_th_screw);
-	m_sample->resetThreadingLayer(2, rho_th_mixed, rc_th_mixed);
+	m_sample->resetThreadingLayer(0, rho_th, rc_th);
     
     for(size_t id = 0; id < m_calculators.size(); ++id)
     {
         /*reinitialization scale and background coefficients*/
         m_scales[id] = params.find(m_scale_names[id])->second;
         m_backgrounds[id] = params.find(m_background_names[id])->second;
-        
-        std::cout << m_scale_names[id] << ":\t" << m_scales[id] << std::endl;
         
         /*update each calculator*/
         m_calculators[id]->setSample(m_sample);

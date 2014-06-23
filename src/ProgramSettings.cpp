@@ -148,57 +148,30 @@ ProgramSettings::SampleConfig::set(const libconfig::Setting& sample,
 
 	if(dislocations.exists("threading"))
 	{
-		const libconfig::Setting &threading = dislocations["threading"];
-		if(threading.exists("edge"))
+	    /*find how many threading dislocation types are present*/
+	    int nb_th_types = dislocations["threading"].getLength();
+		threading.resize(nb_th_types);
+	    for(int i = 0; i < nb_th_types; ++i)
 	    {
-		    threading_edge.rho = threading["edge"]["rho"];
-		    cmap[threading["edge"]["rho"].getPath()] = threading_edge.rho;
-		    threading_edge.rc = threading["edge"]["rc"];
-		    cmap[threading["edge"]["rc"].getPath()] = threading_edge.rc;
-	    }
-	    else
-	    {
-		    threading_edge.rho = 0.0;
-		    cmap[threading.getPath() + ".edge.rho"] = threading_edge.rho;
-		    threading_edge.rc = 0.0;
-		    cmap[threading.getPath() + ".edge.rc"] = threading_edge.rc;
-	    }
-	    threading_edge.b_edge = a0;
-		threading_edge.b_screw = 0.0;
+            const libconfig::Setting & layer = 
+                dislocations["threading"][i];
 
-	    if(threading.exists("screw"))
-	    {
-		    threading_screw.rho = threading["screw"]["rho"];
-		    cmap[threading["screw"]["rho"].getPath()] = threading_screw.rho;
-		    threading_screw.rc = threading["screw"]["rc"];
-		    cmap[threading["screw"]["rc"].getPath()] = threading_screw.rc;
+            threading[i].rho = layer["rho"];
+            cmap[layer["rho"].getPath()] = threading[i].rho;
+            threading[i].rc = layer["rc"];
+            cmap[layer["rc"].getPath()] = threading[i].rc;
+		    /*burgers vector*/
+	        if(layer["b"].isArray() && layer["b"].getLength()
+	                                             == MillerCubIndicesDimension)
+	        {
+		        threading[i].b.X = layer["b"][0];
+		        threading[i].b.Y = layer["b"][1];
+		        threading[i].b.Z = layer["b"][2];
+		    }
+		    else
+		        throw ProgramSettings::Exception(
+		                            layer["b"].getPath());
 	    }
-	    else
-	    {
-		    threading_screw.rho = 0.0;
-            cmap[threading.getPath() + ".screw.rho"] = threading_screw.rho;
-		    threading_screw.rc = 1.0;
-            cmap[threading.getPath() + ".screw.rc"] = threading_screw.rc;
-	    }
-	    threading_screw.b_edge = 0;
-        threading_screw.b_screw = a0;
-
-	    if(threading.exists("mixed"))
-	    {
-		    threading_mixed.rho = threading["mixed"]["rho"];
-		    cmap[threading["mixed"]["rho"].getPath()] = threading_mixed.rho;
-		    threading_mixed.rc = threading["mixed"]["rc"];
-		    cmap[threading["mixed"]["rho"].getPath()] = threading_mixed.rc;
-	    }
-	    else
-	    {
-		    threading_mixed.rho = 0.0;
-		    cmap[threading.getPath() + ".mixed.rho"] = threading_mixed.rho;
-		    threading_mixed.rc = 1.0;
-		    cmap[threading.getPath() + ".mixed.rc"] = threading_mixed.rc;
-	    }
-	    threading_mixed.b_edge = a0;
-		threading_mixed.b_screw = a0;
 	}
 }
 
@@ -223,29 +196,14 @@ operator<<(std::ostream& out, const ProgramSettings::SampleConfig &sample)
     }
 
 	out << "\tThreading dislocations:" << std::endl;
-	out << "\t\tEdge" << std::endl;
-	out << "\t\t\tBurgers vector:\t"
-			<< sample.threading_edge.b_edge << std::endl;
-	out << "\t\t\tDensity:\t" << sample.threading_edge.rho
-			<< std::endl;
-	out << "\t\t\tCorrelation radius:\t"
-			<< sample.threading_edge.rc << std::endl;
+	for(size_t i = 0; i < sample.threading.size(); ++i)
+	{
+	    out << "\t\t[" << i << "]---" << std::endl;
+	    out << "\t\tBurgers vector:\t" << sample.threading[i].b << std::endl;
+	    out << "\t\tDensity:\t" << sample.threading[i].rho << std::endl;
+	    out << "\t\tCorrelation radius:\t" << sample.threading[i].rc << std::endl;
+    }
 
-	out << "\t\tScrew" << std::endl;
-	out << "\t\t\tBurgers vector :\t"	<< sample.threading_screw.b_screw 
-                                        << std::endl;
-	out << "\t\t\tDensity:\t" << sample.threading_screw.rho << std::endl;
-	out << "\t\t\tCorrelation radius:\t"
-			<< sample.threading_screw.rc << std::endl;
-
-	out << "\t\tMixed" << std::endl;
-	out << "\t\t\tBurgers vector (edge):\t"
-			<< sample.threading_mixed.b_edge << std::endl;
-	out << "\t\t\tBurgers vector (screw):\t"
-			<< sample.threading_mixed.b_screw << std::endl;
-	out << "\t\t\tDensity:\t" << sample.threading_mixed.rho << std::endl;
-	out << "\t\t\tCorrelation radius:\t"
-			<< sample.threading_mixed.rc << std::endl;
 	return out;
 }
 
