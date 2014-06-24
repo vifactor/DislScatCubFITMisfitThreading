@@ -51,17 +51,16 @@ double ANASampleCub::T_misfit(double x, double y, double z1, double z2) const
 void ANASampleCub::addThreadingLayer(double rho, double b_edge, double b_screw, double rc,
 		double Qx, double Qz, double nu)
 {
-	m_layers.push_back(new ANAThreadingLayerCub(rho, b_edge, b_screw, rc, Qx, Qz, nu));
+    m_layers.push_back(new ANAThreadingLayerCub(rho, b_edge, b_screw, rc, Qx, Qz, nu));
 }
 
 void ANASampleCub::addMisfitInterface(double rho, double bx, double by, double bz,
                     double Qx, double Qy, double Qz,
                     double phi, double nu, double d)
 {
-    std::cout << Qx << "\t" << Qy << "\t" << Qz << std::endl;
-	m_interfaces.push_back(new AnalyticalMisfitInterfaceCub(rho, bx, by, bz,
-	                     Qx, Qy, Qz,
-	                     phi, nu, d));
+    m_interfaces.push_back(new AnalyticalMisfitInterfaceCub(rho, bx, by, bz,
+                         Qx, Qy, Qz,
+                         phi, nu, d));
 }
 
 void ANASampleCub::wij(double z1, double& wxx, double& wxz, double& wzz) const

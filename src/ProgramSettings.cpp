@@ -40,7 +40,6 @@ ProgramSettings::DataConfig::set(const libconfig::Setting& data,
 std::ostream&
 operator<<(std::ostream& out, const ProgramSettings::DataConfig &data)
 {
-    out << "--- Data settings--- " << std::endl;
     out << "\tFile:\t" << data.file << std::endl;
 	out << "\tReflection:\t" << data.Q << std::endl;
 	out << "\tResolutions (dqx, dqz):\t" << data.resolX
@@ -248,6 +247,7 @@ void ProgramSettings::read(const filesystem::path& cfgdir)
 		datacfg.setAutoConvert(true);
 		const libconfig::Setting& dataroot = datacfg.getRoot();
 		m_dataConfig.resize(dataroot["Data"].getLength());
+		std::cout << "--- Data settings--- " << std::endl;
 		for(size_t i = 0; i < m_dataConfig.size(); i++)
 		{
 		    m_dataConfig[i].set(dataroot["Data"][i], m_cpMap);
@@ -261,9 +261,11 @@ void ProgramSettings::read(const filesystem::path& cfgdir)
 		m_fitConfig.set(fitroot["Fit"], m_cpMap);
 		std::cout << m_fitConfig << std::endl;
 		
+		std::cout << "--- Calculator parameters ---" << std::endl;
         for (CalculatorParameterMap::const_iterator it=m_cpMap.begin();
                 it!=m_cpMap.end(); ++it)
-            std::cout << it->first << " => " << it->second << std::endl;
+            std::cout << "\t" << it->first << " => " << it->second << std::endl;
+        std::cout << std::endl;
 
 	} catch (const libconfig::FileIOException &fioex)
 	{

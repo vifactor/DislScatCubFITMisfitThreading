@@ -295,6 +295,7 @@ void Engine::setupComponents()
         setupCalculator(id);
     m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculators);
     
+    std::cout << "--- Data files ---" << std::endl;
     for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
 	    readData(id);
     m_ini_intens_vals.resize(m_exp_intens_vals.size(), 0.0);
@@ -341,7 +342,7 @@ void Engine::readData(size_t id)
         }
         
         m_vals_sizes.push_back(m_vals_sizes.back() + intensity.size());
-        std::cout << "Nb data residuals:\t" << intensity.size() << std::endl;
+        std::cout << "\t" << datapath << "::" << intensity.size() << std::endl;
     }
 }
 
@@ -364,7 +365,6 @@ void Engine::setupCalculator(size_t id)
 	*/
 	Q[0] *= GSL_SIGN (Q_vec[0]);
     
-    std::cout << "Q:\t" << Q(0) << "," << Q(1) << "," << Q(2) << std::endl;
 	try
 	{
 	    m_calculators.push_back(new ANACalculatorCoplanarTriple(150
