@@ -58,6 +58,7 @@ void ANASampleCub::addMisfitInterface(double rho, double bx, double by, double b
                     double Qx, double Qy, double Qz,
                     double phi, double nu, double d)
 {
+    std::cout << Qx << "\t" << Qy << "\t" << Qz << std::endl;
 	m_interfaces.push_back(new AnalyticalMisfitInterfaceCub(rho, bx, by, bz,
 	                     Qx, Qy, Qz,
 	                     phi, nu, d));
@@ -77,6 +78,10 @@ void ANASampleCub::wij(double z1, double& wxx, double& wxz, double& wzz) const
 		wxz += m_interfaces[i]->wxz() * m_interfaces[i]->get_rho() / 2;
 		wzz += m_interfaces[i]->wzz() * m_interfaces[i]->get_rho() / 2;
 	}
+	
+	/*std::cout << "wxx:\t" << wxx << std::endl;
+	std::cout << "wxz:\t" << wxz << std::endl;
+	std::cout << "wzz:\t" << wzz << std::endl;*/
 }
 
 void ANASampleCub::resetMisfitInterface(size_t i, double rho)

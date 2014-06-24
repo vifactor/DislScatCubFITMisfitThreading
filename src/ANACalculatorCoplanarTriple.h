@@ -17,17 +17,18 @@
 class ANACalculatorCoplanarTriple
 {
 public:
-	ANACalculatorCoplanarTriple(const ANASampleCub * sample, size_t sampling = 100, double epsabs = 1e-5);
+	ANACalculatorCoplanarTriple(size_t sampling = 100, double epsabs = 1e-5);
 	virtual ~ANACalculatorCoplanarTriple();
 
 	virtual void setResolution(double fwhm_qx, double fwhm_qz);
-	virtual void setSample(const ANASampleCub * sample) {m_sample = sample;}
+	virtual void setSample(ANASampleCub * );
+	ANASampleCub * getSample() {return m_sample;}
 	virtual double I(const double qx, const double qz) const;
 	virtual double I(const double qx, const double qz, double & error) const;
-
+	
 	friend double ana_coplanar_triple_integrand_xz1(double x, void *params);
 protected:
-	const ANASampleCub * m_sample;
+    ANASampleCub * m_sample;
 
 	mutable double m_qx, m_qz;
 	double m_resol2_x, m_resol2_z;

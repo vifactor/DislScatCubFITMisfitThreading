@@ -78,9 +78,15 @@ double toMisfitInPlaneAngle(const Vector3d& Q, const Vector3d& burgers,
     
     Qz = inner_prod(Q, norm_dir);
     Qpar = Q - Qz * norm_dir;
-    Qpar_dir = normalize(Qpar);
-    
-    return acos(inner_prod(Qpar_dir, misf_dir));
+    if(norm_2(Qpar) < 1e-10)
+    {
+        return 0;
+    }
+    else
+    {
+        Qpar_dir = normalize(Qpar);
+        return acos(inner_prod(Qpar_dir, misf_dir));
+    }
 }
 /*----------- end handy functions -----------*/
 Engine::Engine()
@@ -88,8 +94,6 @@ Engine::Engine()
 	m_fitter = NULL;
 	m_programSettings = NULL;
 	m_fit_calculator = NULL;
-	m_sample = NULL;
-	
 }
 
 Engine::~Engine()
@@ -102,7 +106,6 @@ Engine::~Engine()
 
 void Engine::exec(const filesystem::path & workDir)
 {
-   
     m_WorkDir = workDir;
 	m_programSettings = new ProgramSettings;
 	m_programSettings->read(m_WorkDir);
@@ -122,7 +125,11 @@ void Engine::init()
 	for(size_t i = 0; i < m_calculators.size(); ++i)
 	{
         if(m_calculators[i])
+        {
+            if(m_calculators[i]->getSample())
+                delete m_calculators[i]->getSample();
             delete m_calculators[i];
+        }
 	}
 	if(m_fit_calculator)
 		delete m_fit_calculator;
@@ -286,6 +293,7 @@ void Engine::setupComponents()
 {
     for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
         setupCalculator(id);
+    m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculators);
     
     for(size_t id = 0; id < m_programSettings->getDataConfig().size(); ++id)
 	    readData(id);
@@ -355,11 +363,20 @@ void Engine::setupCalculator(size_t id)
 	 * like [224] and [-2-24]
 	*/
 	Q[0] *= GSL_SIGN (Q_vec[0]);
-                
+    
+    std::cout << "Q:\t" << Q(0) << "," << Q(1) << "," << Q(2) << std::endl;
 	try
 	{
-		m_sample = new ANASampleCub(m_programSettings->getSampleConfig().thickness,
-				m_programSettings->getSampleConfig().width);
+	    m_calculators.push_back(new ANACalculatorCoplanarTriple(150
+				/*FIXME : make sampling a part of program settings
+				 m_programSettings->getCalculatorSettings().sampling*/));
+        m_calculators.back()->setSample(new ANASampleCub(
+                m_programSettings->getSampleConfig().thickness,
+                m_programSettings->getSampleConfig().width));
+        
+        m_calculators.back()->setResolution(
+				m_programSettings->getDataConfig(id).resolX,
+				m_programSettings->getDataConfig(id).resolZ);
 
 		/*misfit interfaces*/
 		const std::vector<ProgramSettings::SampleConfig::MisfitDislocationType>& 
@@ -371,7 +388,7 @@ void Engine::setupCalculator(size_t id)
 	        
 	        b = toMisfitFrame(b_vec, l_vec, n_vec);
 	        phi = toMisfitInPlaneAngle(Q_vec, b_vec, l_vec, n_vec);
-            m_sample->addMisfitInterface(
+            m_calculators.back()->getSample()->addMisfitInterface(
                 mf_dislocations[i].rho * 1e-7,
                 b(0), b(1), b(2),
                 Q(0), Q(1), Q(2),
@@ -386,21 +403,13 @@ void Engine::setupCalculator(size_t id)
         {
             b_vec = transformator.toVector3d(th_dislocations[id].b);
             b = toThreadingFrame(b_vec, n_vec);
-            m_sample->addThreadingLayer(th_dislocations[id].rho * 1e-14,
+            m_calculators.back()->getSample()->addThreadingLayer(
+                th_dislocations[id].rho * 1e-14,
                 b(0), b(2),
                 th_dislocations[id].rc, 
                 Q(0), Q(2),
                 m_programSettings->getSampleConfig().nu);
         }
-
-		m_calculators.push_back(new ANACalculatorCoplanarTriple(m_sample, 150
-				/*FIXME : make sampling a part of program settings
-				 m_programSettings->getCalculatorSettings().sampling*/));
-		m_calculators.back()->setResolution(
-				m_programSettings->getDataConfig(id).resolX,
-				m_programSettings->getDataConfig(id).resolZ);
-
-		m_fit_calculator = new FitANACalculatorCoplanarTriple(m_calculators, m_sample);
 	} catch (std::exception& ex)
 	{
 		throw Engine::Exception(

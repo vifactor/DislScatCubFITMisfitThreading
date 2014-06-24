@@ -20,11 +20,10 @@ double ana_coplanar_triple_integrand_xz1(double x, void *params)
 	return result;
 }
 
-ANACalculatorCoplanarTriple::ANACalculatorCoplanarTriple(
-		const ANASampleCub * sample, size_t sampling, double epsabs)
+ANACalculatorCoplanarTriple::ANACalculatorCoplanarTriple(size_t sampling, double epsabs)
 {
 
-	m_sample = sample;
+	m_sample = NULL;
 
 	m_qx = 0.0;
 	m_qz = 0.0;
@@ -53,13 +52,6 @@ ANACalculatorCoplanarTriple::ANACalculatorCoplanarTriple(
 	m_sampling = sampling;
 	m_z1 = new double[m_sampling];
 	m_integrand_values = new double[m_sampling];
-	for(size_t i = 0; i < m_sampling - 1; ++i)
-	{
-		m_z1[i] = i * m_sample->m_thickness / m_sampling;
-		m_integrand_values[i] = 0.0;
-	}
-	/*at z1 = d, the correlation function is undefined*/
-	m_z1[m_sampling - 1] = m_sample->m_thickness * 0.999;
 
 	/*allocate interpolation staff*/
 	m_interp =  gsl_interp_alloc (gsl_interp_cspline, m_sampling);
@@ -82,6 +74,18 @@ ANACalculatorCoplanarTriple::~ANACalculatorCoplanarTriple()
 		gsl_integration_workspace_free(m_workspace);
 	if(m_cyclic_workspace)
 		gsl_integration_workspace_free(m_cyclic_workspace);
+}
+
+void ANACalculatorCoplanarTriple::setSample(ANASampleCub * sample)
+{
+    m_sample = sample;
+    for(size_t i = 0; i < m_sampling - 1; ++i)
+    {
+        m_z1[i] = i * m_sample->m_thickness / m_sampling;
+        m_integrand_values[i] = 0.0;
+    }
+    /*at z1 = d, the correlation function is undefined*/
+    m_z1[m_sampling - 1] = m_sample->m_thickness * 0.999;
 }
 
 void ANACalculatorCoplanarTriple::setResolution(double fwhm_qx, double fwhm_qz)

@@ -51,7 +51,6 @@ private:
 	void saveFitData(size_t id) const;
 	void printFitterInfo(NonlinearFit::NonlinearFitter * fitter);
 
-	ANASampleCub  * m_sample;
 	std::vector<ANACalculatorCoplanarTriple *>  m_calculators;
 	FitANACalculatorCoplanarTriple *  m_fit_calculator;
 	NonlinearFit::NonlinearFitter * m_fitter;
